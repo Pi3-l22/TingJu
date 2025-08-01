@@ -1,0 +1,5 @@
+Flask
+edge-tts
+PyMuPDF
+nltk
+translators
