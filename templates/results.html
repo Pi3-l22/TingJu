@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>处理结果</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .description {
+            margin-bottom: 30px;
+            line-height: 1.6;
+            text-align: center;
+        }
+        .result-item {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #fafafa;
+        }
+        .sentence {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .translation {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f0f8ff;
+            border-radius: 5px;
+        }
+        .audio-controls {
+            margin-top: 10px;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .button-group .btn {
+            margin: 0 10px;
+        }
+        .audio-player {
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>处理结果</h1>
+        
+        <div class="description">
+            <p>以下是处理完成的结果，包括原文、翻译和音频：</p>
+        </div>
+        
+        {% for item in results %}
+        <div class="result-item">
+            <div class="sentence"><strong>原文 {{ loop.index }}:</strong> {{ item.sentence }}</div>
+            <div class="translation"><strong>翻译:</strong> {{ item.translation }}</div>
+            <div class="audio-controls">
+                <audio controls class="audio-player">
+                    <source src="/{{ item.audio_path }}" type="audio/mpeg">
+                    您的浏览器不支持音频播放。
+                </audio>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="window.location.href='/'">处理新文件</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本处理工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .description {
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #007bff;
+        }
+        .upload-area.highlight {
+            border-color: #007bff;
+            background-color: #f0f8ff;
+        }
+        .file-input {
+            margin: 20px 0;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #file-name {
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>文本处理工具</h1>
+        
+        <div class="description">
+            <p>欢迎使用文本处理工具！本工具可以帮助您：</p>
+            <ul>
+                <li>上传PDF、TXT、DOCX等格式的文档</li>
+                <li>自动提取文档中的文本内容</li>
+                <li>将文本分割成句子进行处理</li>
+                <li>为每个句子生成翻译和语音</li>
+            </ul>
+        </div>
+        
+        <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+            <div class="upload-area" id="drop-area">
+                <p>将文件拖拽到此处或点击选择文件</p>
+                <input type="file" id="file-input" name="file" class="file-input" accept=".pdf,.txt,.docx,.xps,.epub,.mobi,.fb2,.cbz,.svg,.xlsx,.pptx" style="display: none;">
+                <button type="button" class="btn" id="browse-btn">选择文件</button>
+                <div id="file-name"></div>
+            </div>
+            <button type="submit" class="btn" id="upload-btn" disabled>上传并处理</button>
+        </form>
+    </div>
+
+    <script>
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('file-input');
+        const browseBtn = document.getElementById('browse-btn');
+        const uploadBtn = document.getElementById('upload-btn');
+        const fileName = document.getElementById('file-name');
+
+        // 点击按钮时触发文件选择
+        browseBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // 文件选择后显示文件名并启用上传按钮
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                fileName.textContent = `已选择文件: ${fileInput.files[0].name}`;
+                uploadBtn.disabled = false;
+            } else {
+                fileName.textContent = '';
+                uploadBtn.disabled = true;
+            }
+        });
+
+        // 拖拽上传功能
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropArea.classList.add('highlight');
+        }
+
+        function unhighlight() {
+            dropArea.classList.remove('highlight');
+        }
+
+        // 处理文件拖拽放置
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                // 设置文件到input元素
+                fileInput.files = files;
+                fileName.textContent = `已选择文件: ${files[0].name}`;
+                uploadBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

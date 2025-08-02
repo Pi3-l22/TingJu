@@ -1,4 +1,6 @@
-Flask
+fastapi
+uvicorn
+python-multipart
 edge-tts
 PyMuPDF
 nltk
