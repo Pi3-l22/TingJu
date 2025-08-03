@@ -7,7 +7,7 @@
 :root {
 	/* 主要颜色 */
 	--primary-color: #4285f4;
-	--primary-bg-color: #cee0ff;
+	--primary-bg-color: #e0eafc;
 	--primary-hover-color: #3266b9;
 	--secondary-color: #6c757d;
 	--secondary-hover-color: #545b62;
@@ -28,11 +28,11 @@
 
 	/* 状态颜色 */
 	--success-color: #34a853;
-	--success-bg-color: #d3ffdf;
+	--success-bg-color: #e3f9e9;
 	--error-color: #ea4335;
-	--error-bg-color: #ffe3e0;
-	--warning-color: #fbbc05;
-	--warning-bg-color: #fff7e0;
+	--error-bg-color: #fde8e5;
+	--warning-color: #ffa502;
+	--warning-bg-color: #fff3e0;
 
 	/* 特殊颜色 */
 	--highlight-bg-color: #f0f8ff;

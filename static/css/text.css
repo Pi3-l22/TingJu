@@ -73,6 +73,27 @@ textarea {
 	background-position: right 15px center;
 	background-size: 18px;
 	cursor: pointer;
+	transition: var(--transition);
+}
+
+.voice-selector select:focus {
+	border-color: var(--primary-color);
+}
+
+.voice-selector select option {
+	background-color: var(--container-bg-color);
+	color: var(--text-primary-color);
+	padding: 10px;
+	line-height: 1.5;
+}
+
+.voice-selector select option:hover {
+	background-color: var(--primary-bg-color) !important;
+}
+
+.voice-selector select option:checked {
+	background-color: var(--primary-color);
+	color: var(--text-light-color);
 }
 
 .btn {
@@ -132,5 +153,20 @@ textarea {
 }
 
 .error:not(:empty) {
+	display: block; /* 当有内容时显示 */
+}
+
+.warning {
+	color: var(--warning-color);
+	font-weight: bold;
+	margin-top: 15px;
+	padding: 5px 10px;
+	border: 1px solid var(--warning-color);
+	border-radius: var(--border-radius);
+	background-color: var(--warning-bg-color);
+	display: none; /* 默认隐藏 */
+}
+
+.warning:not(:empty) {
 	display: block; /* 当有内容时显示 */
 }

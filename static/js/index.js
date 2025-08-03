@@ -1,5 +1,5 @@
 // 点击按钮时触发文件选择
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const dropArea = document.getElementById('drop-area');
     const fileInput = document.getElementById('file-input');
     const browseBtn = document.getElementById('browse-btn');
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (fileInput) {
         fileInput.addEventListener('change', () => {
             if (fileInput.files.length > 0) {
-                fileName.textContent = `已选择文件: ${fileInput.files[0].name}`;
+                fileName.textContent = `已选择: ${fileInput.files[0].name}`;
                 if (uploadBtn) uploadBtn.disabled = false;
             } else {
                 fileName.textContent = '';
@@ -66,12 +66,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (files.length > 0 && fileInput) {
                 // 设置文件到input元素
                 fileInput.files = files;
-                fileName.textContent = `已选择文件: ${files[0].name}`;
+                fileName.textContent = `已选择: ${files[0].name}`;
                 if (uploadBtn) uploadBtn.disabled = false;
             }
         }
     }
-    
+
     // 手动填写按钮点击事件
     if (manualBtn) {
         manualBtn.addEventListener('click', () => {

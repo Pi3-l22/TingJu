@@ -47,6 +47,7 @@ a {
 
 .upload-area:hover {
 	border-color: var(--primary-color);
+	background-color: var(--primary-bg-color);
 }
 
 .upload-area.highlight {
@@ -84,7 +85,19 @@ a {
 }
 
 #file-name {
-	margin-top: 10px;
-	font-style: italic;
-	color: var(--text-secondary-color);
+	margin-top: 15px;
+	font-style: bold;
+	color: var(--success-color);
+	display: none;
+	padding: 5px 10px;
+	border: 1px solid var(--success-color);
+	border-radius: var(--border-radius);
+	background-color: var(--success-bg-color);
+	width: fit-content;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#file-name:not(:empty) {
+	display: block;
 }

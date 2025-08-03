@@ -70,16 +70,16 @@ async function populateVoices() {
             } else if (voice.gender === 'Female') {
                 gender = ' (女) ';
             }
-
+            console.log(voice.style);
             // 获取风格信息
             let style = '无';
-            if (voice.style && voice.style.VoicePersonalities && voice.style.VoicePersonalities.length > 0) {
-                style = voice.style.VoicePersonalities.join(', ');
+            if (voice.style && voice.style.length > 0) {
+                style = voice.style.join(', ');
             }
 
             // 使用处理后的音色名称显示
             const displayName = getVoiceDisplayName(voice.name);
-            option.textContent = `${displayName}${gender}风格: ${style}`;
+            option.textContent = `${displayName}${gender}- 风格: ${style}`;
             voiceSelect.appendChild(option);
         });
 
@@ -94,7 +94,7 @@ async function populateVoices() {
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('confirm-form');
     const textArea = document.getElementById('text-content');
-    const errorDiv = document.getElementById('text-error');
+    const errorDiv = document.getElementById('text-warning');
 
     if (form && textArea && errorDiv) {
         form.addEventListener('submit', function (e) {
