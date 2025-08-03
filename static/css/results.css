@@ -1,0 +1,91 @@
+@import url('./theme.css');
+
+body {
+    font-family: Arial, sans-serif;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--body-bg-color);
+}
+
+.container {
+    background-color: var(--container-bg-color);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px var(--shadow-color);
+}
+
+h1 {
+    color: var(--text-primary-color);
+    text-align: center;
+}
+
+.description {
+    margin-bottom: 30px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.result-item {
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: var(--item-bg-color);
+}
+
+.sentence {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: var(--text-primary-color);
+}
+
+.translation {
+    font-size: 16px;
+    color: var(--text-secondary-color);
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: var(--highlight-bg-color);
+    border-radius: 5px;
+}
+
+.audio-controls {
+    margin-top: 10px;
+}
+
+.btn {
+    background-color: var(--primary-color);
+    color: var(--text-light-color);
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--secondary-hover-color);
+}
+
+.button-group {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.button-group .btn {
+    margin: 0 10px;
+}
+
+.audio-player {
+    width: 100%;
+    margin-top: 10px;
+}

@@ -12,13 +12,17 @@ from fastapi.templating import Jinja2Templates
 from utils.file_processor import extract_text_from_file
 from utils.text_processor import init_nltk, get_sentences
 from utils.text_translator import get_text_translated
-from utils.audio_generator import generate_audio_sync
+from utils.audio_generator import generate_audio, list_voices, AUDIO_DIR
 from utils.logger import logger
 
 app = FastAPI()
 
+# 创建音频目录
+Path(AUDIO_DIR).mkdir(exist_ok=True)
+
 # 挂载静态文件目录
-app.mount("/audios", StaticFiles(directory="audios"), name="audios")
+app.mount(f"/{AUDIO_DIR}", StaticFiles(directory=AUDIO_DIR), name=AUDIO_DIR)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/templates", StaticFiles(directory="templates"), name="templates")
 
 # 配置模板
@@ -36,6 +40,16 @@ async def read_root(request: Request):
     根路由，返回工具介绍和文件上传页面
     """
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/manual", response_class=HTMLResponse)
+async def manual_input(request: Request):
+    """
+    手动填写文本内容
+    """
+    return templates.TemplateResponse("text.html", {
+        "request": request,
+        "text": ""  # 空文本，让用户自行填写
+    })
 
 @app.post("/upload")
 async def upload_file(request: Request, file: UploadFile = File(...)):
@@ -71,19 +85,19 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
         TEMP_FILE_PATH = temp_file_path
         
         # 跳转到文本确认页面
-        return templates.TemplateResponse("text_confirm.html", {
+        return templates.TemplateResponse("text.html", {
             "request": request,
             "text": extracted_text
         })
     except Exception as e:
-        logger.error(f"处理文件时出错: {str(e)}")
+        logger.error(f"处理文件 {file.filename} 时出错: {str(e)}")
         return templates.TemplateResponse("index.html", {
             "request": request,
             "error": f"处理文件时出错: {str(e)}"
         })
 
-@app.post("/process_text")
-async def process_text(request: Request, text: str = Form(...)):
+@app.post("/generate")
+async def generate(request: Request, text: str = Form(...), voice: str = Form(...)):
     """
     处理用户确认的文本，进行分句、翻译和音频生成
     """
@@ -92,7 +106,7 @@ async def process_text(request: Request, text: str = Form(...)):
         sentences = get_sentences(text)
         
         if not sentences:
-            return templates.TemplateResponse("text_confirm.html", {
+            return templates.TemplateResponse("text.html", {
                 "request": request,
                 "text": text,
                 "error": "未能从文本中分割出句子，请检查文本内容。"
@@ -105,22 +119,13 @@ async def process_text(request: Request, text: str = Form(...)):
         translated_sentences = get_text_translated(sentences)
         
         # 生成音频
-        voice_name = "en-US-ChristopherNeural"
-        generate_audio_sync(sentences, voice_name, title)
+        voice_name = voice if voice else "en-US-ChristopherNeural"
+        audio_dir, audio_filenames = await generate_audio(sentences, voice_name, title)
         
         # 构建结果列表
         results = []
-        audio_dir = Path("audios") / title
-        
-        for i, (sentence, translation) in enumerate(zip(sentences, translated_sentences)):
-            # 构建音频文件路径
-            # 注意：这里需要与audio_generator中的文件命名方式保持一致
-            import hashlib
-            stripped_text = sentence.strip()
-            text_hash = hashlib.md5(stripped_text.encode('utf-8')).hexdigest()
-            audio_filename = f"{i+1}_{text_hash}.mp3"
-            audio_path = f"audios/{title}/{audio_filename}"
-            
+        for i, (sentence, translation, audio_filename) in enumerate(zip(sentences, translated_sentences, audio_filenames)):
+            audio_path = Path(audio_dir) / audio_filename
             results.append({
                 "sentence": sentence,
                 "translation": translation,
@@ -141,11 +146,23 @@ async def process_text(request: Request, text: str = Form(...)):
         
     except Exception as e:
         logger.error(f"处理文本时出错: {str(e)}")
-        return templates.TemplateResponse("text_confirm.html", {
+        return templates.TemplateResponse("text.html", {
             "request": request,
             "text": text,
             "error": f"处理文本时出错: {str(e)}"
         })
+
+@app.get("/voices")
+async def get_voices():
+    """
+    获取可用的音色列表
+    """
+    try:
+        voices = await list_voices()
+        return {"voices": voices}
+    except Exception as e:
+        logger.error(f"获取音色列表时出错: {str(e)}")
+        return {"error": f"获取音色列表时出错: {str(e)}"}
 
 if __name__ == "__main__":
     import uvicorn

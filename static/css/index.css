@@ -1,0 +1,90 @@
+@import url("./theme.css");
+
+body {
+	font-family: var(--text-sans-font);
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 20px;
+	background-color: var(--body-bg-color);
+}
+
+.container {
+	background-color: var(--container-bg-color);
+	padding: 30px;
+	border-radius: var(--border-radius);
+	box-shadow: var(--box-shadow);
+}
+
+h1 {
+	color: var(--text-primary-color);
+	text-align: center;
+	font-size: 40px;
+	font-family: var(--title-font);
+}
+
+a {
+	color: var(--text-primary-color);
+	text-decoration: none;
+}
+
+.description {
+	margin-bottom: 20px;
+	line-height: 1.6;
+}
+
+.description ul {
+	text-align: left;
+}
+
+.upload-area {
+	border: 3px dashed var(--border-color);
+	border-radius: var(--border-radius);
+	padding: 30px;
+	text-align: center;
+	margin-bottom: 20px;
+	transition: var(--transition);
+}
+
+.upload-area:hover {
+	border-color: var(--primary-color);
+}
+
+.upload-area.highlight {
+	border-color: var(--primary-color);
+	background-color: var(--highlight-bg-color);
+}
+
+.file-input {
+	margin: 20px 0;
+}
+
+.btn {
+	background-color: var(--primary-color);
+	color: var(--text-light-color);
+	padding: 8px 16px;
+	border: none;
+	border-radius: var(--border-radius);
+	cursor: pointer;
+	font-size: 16px;
+	transition: var(--transition);
+}
+
+.btn:hover {
+	background-color: var(--primary-hover-color);
+}
+
+.btn:disabled {
+	background-color: var(--secondary-color);
+	cursor: not-allowed;
+}
+
+.btn-group {
+	display: flex;
+	justify-content: space-around;
+}
+
+#file-name {
+	margin-top: 10px;
+	font-style: italic;
+	color: var(--text-secondary-color);
+}

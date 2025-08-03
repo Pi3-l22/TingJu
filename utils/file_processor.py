@@ -4,10 +4,7 @@ from pathlib import Path
 import pymupdf
 from utils.logger import logger
 
-FILE_TYPES = ['.pdf', '.xps', '.epub', '.mobi', '.fb2', '.cbz', '.svg', '.txt', '.docx', '.xlsx', '.pptx']
-
-def list_file_types() -> list:
-    return FILE_TYPES
+FILE_TYPES = ['.pdf', '.txt', '.docx', '.xlsx', '.pptx', '.svg', '.epub', '.mobi', '.xps', '.fb2', '.cbz']
 
 def extract_text_from_file(file_path: str) -> str:
     # 先检查文件类型是否正确，文件是否存在

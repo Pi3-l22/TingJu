@@ -28,7 +28,7 @@ def setup_logger(name: str = "tingju", log_level: int = logging.INFO) -> logging
         
         # 创建格式器并添加到处理器
         formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            '%(asctime)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s'
         )
         file_handler.setFormatter(formatter)
         console_handler.setFormatter(formatter)

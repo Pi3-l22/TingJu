@@ -1,0 +1,53 @@
+/* 引入Google字体 */
+@import url("https://fonts.googleapis.com/css2?family=Bree+Serif&family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@100..900&family=Noto+Serif+SC:wght@200..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Outfit:wght@100..900&family=Pacifico&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap");
+/* Ma Shan Zheng, Pacifico */
+/* Bree Serif, Source Serif 4, Source Sans 3, Outfit, Nunito, Google Sans Code, Noto Sans SC, Noto Serif SC */
+
+/* 统一主题颜色配置 */
+:root {
+	/* 主要颜色 */
+	--primary-color: #4285f4;
+	--primary-bg-color: #cee0ff;
+	--primary-hover-color: #3266b9;
+	--secondary-color: #6c757d;
+	--secondary-hover-color: #545b62;
+
+	/* 背景颜色 */
+	--body-bg-color: #f5f5f5;
+	--container-bg-color: #ffffff;
+	--item-bg-color: #fafafa;
+
+	/* 文字颜色 */
+	--text-primary-color: #333333;
+	--text-secondary-color: #666666;
+	--text-light-color: #ffffff;
+
+	/* 边框和阴影 */
+	--border-color: #dddddd;
+	--box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
+	/* 状态颜色 */
+	--success-color: #34a853;
+	--success-bg-color: #d3ffdf;
+	--error-color: #ea4335;
+	--error-bg-color: #ffe3e0;
+	--warning-color: #fbbc05;
+	--warning-bg-color: #fff7e0;
+
+	/* 特殊颜色 */
+	--highlight-bg-color: #f0f8ff;
+
+	/* 圆角大小 */
+	--border-radius: 10px;
+
+	/* transition */
+	--transition: all 0.3s ease-in-out;
+
+	/* 字体样式 */
+	--serif-font: "Source Serif 4", "Bree Serif", "Times New Roman", Times, serif;
+	--sans-font: "Source Sans 3", "Outfit", "Nunito", Arial, sans-serif;
+	--mono-font: "Google Sans Code", "SF Mono", "Consolas", monospace;
+	--title-font: "Pacifico", "Ma Shan Zheng", var(--sans-font);
+	--text-sans-font: "Noto Sans SC", sans-serif;
+	--text-serif-font: "Noto Serif SC", serif;
+}

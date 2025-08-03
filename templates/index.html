@@ -1,164 +1,49 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文本处理工具</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .description {
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-        .upload-area {
-            border: 2px dashed #ccc;
-            border-radius: 10px;
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 20px;
-            transition: border-color 0.3s;
-        }
-        .upload-area:hover {
-            border-color: #007bff;
-        }
-        .upload-area.highlight {
-            border-color: #007bff;
-            background-color: #f0f8ff;
-        }
-        .file-input {
-            margin: 20px 0;
-        }
-        .btn {
-            background-color: #007bff;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        .btn:hover {
-            background-color: #0056b3;
-        }
-        .btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        #file-name {
-            margin-top: 10px;
-            font-style: italic;
-            color: #666;
-        }
-    </style>
+    <title>听句 TingJu - 英语听说学习神器</title>
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
+    <link rel="stylesheet" href="/static/css/index.css">
 </head>
+
 <body>
     <div class="container">
-        <h1>文本处理工具</h1>
-        
+        <h1><a href="https://github.com/Pi3-l22/TingJu" target="_blank">听句 TingJu</a></h1>
+
         <div class="description">
-            <p>欢迎使用文本处理工具！本工具可以帮助您：</p>
+            <p>🎉 欢迎使用<strong>「听句 TingJu」</strong>，一个英语听说学习神器，让英语听说变得简单！
+                上传文章或手动输入，即刻获得：✅智能分句、✅双语对照、✅标准发音，助您高效提升听说能力，随时随地说地道英语！</p>
+            </p>
             <ul>
-                <li>上传PDF、TXT、DOCX等格式的文档</li>
-                <li>自动提取文档中的文本内容</li>
-                <li>将文本分割成句子进行处理</li>
-                <li>为每个句子生成翻译和语音</li>
+                <li>📂 <strong>多种格式</strong>：支持<strong>PDF、TXT、DOCX、XLSX、PPTX</strong>等主流格式</li>
+                <li>⚡ <strong>快速提取</strong>：<strong>3</strong>秒内完成文本内容解析，解放你的双手</li>
+                <li>✂️ <strong>智能分句</strong>：使用<strong>NLP自然语言处理</strong>，根据语义/语法规则进行精准分句</li>
+                <li>🌐 <strong>精准翻译</strong>：调用<strong>Bing、Baidu、Youdao</strong>等多种翻译器，生成准确翻译</li>
+                <li>🔊 <strong>标准发音</strong>：使用<strong>Edge官方英文音色</strong>，还原标准地道的英文发音</li>
             </ul>
+            <hr>
+            <p style="text-align: center;">🚀 Go！点击下方 👇 开始学习，祝学习愉快！</p>
         </div>
-        
+
         <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
             <div class="upload-area" id="drop-area">
                 <p>将文件拖拽到此处或点击选择文件</p>
-                <input type="file" id="file-input" name="file" class="file-input" accept=".pdf,.txt,.docx,.xps,.epub,.mobi,.fb2,.cbz,.svg,.xlsx,.pptx" style="display: none;">
+                <input type="file" id="file-input" name="file" class="file-input"
+                    accept=".pdf,.txt,.docx,.xps,.epub,.mobi,.fb2,.cbz,.svg,.xlsx,.pptx" style="display: none;">
                 <button type="button" class="btn" id="browse-btn">选择文件</button>
                 <div id="file-name"></div>
             </div>
-            <button type="submit" class="btn" id="upload-btn" disabled>上传并处理</button>
+            <div class="btn-group">
+                <button type="submit" class="btn" id="upload-btn" disabled>上传识别</button>
+                <button type="button" class="btn" id="manual-btn">手动填写</button>
+            </div>
         </form>
     </div>
 
-    <script>
-        const dropArea = document.getElementById('drop-area');
-        const fileInput = document.getElementById('file-input');
-        const browseBtn = document.getElementById('browse-btn');
-        const uploadBtn = document.getElementById('upload-btn');
-        const fileName = document.getElementById('file-name');
-
-        // 点击按钮时触发文件选择
-        browseBtn.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        // 文件选择后显示文件名并启用上传按钮
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files.length > 0) {
-                fileName.textContent = `已选择文件: ${fileInput.files[0].name}`;
-                uploadBtn.disabled = false;
-            } else {
-                fileName.textContent = '';
-                uploadBtn.disabled = true;
-            }
-        });
-
-        // 拖拽上传功能
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, preventDefaults, false);
-        });
-
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropArea.addEventListener(eventName, highlight, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, unhighlight, false);
-        });
-
-        function highlight() {
-            dropArea.classList.add('highlight');
-        }
-
-        function unhighlight() {
-            dropArea.classList.remove('highlight');
-        }
-
-        // 处理文件拖拽放置
-        dropArea.addEventListener('drop', handleDrop, false);
-
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            handleFiles(files);
-        }
-
-        function handleFiles(files) {
-            if (files.length > 0) {
-                // 设置文件到input元素
-                fileInput.files = files;
-                fileName.textContent = `已选择文件: ${files[0].name}`;
-                uploadBtn.disabled = false;
-            }
-        }
-    </script>
+    <script src="/static/js/index.js"></script>
 </body>
+
 </html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>听句 TingJu - 英语听说学习神器</title>
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
+    <link rel="stylesheet" href="/static/css/text.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1><a href="https://github.com/Pi3-l22/TingJu" target="_blank">听句 TingJu</a></h1>
+
+        <div class="description">
+            <p>📝 你可以在下方编辑文本，🔎 记得仔细检查一下，内容是否正确无误</p>
+        </div>
+
+        <form id="confirm-form" action="/generate" method="post">
+            <textarea id="text-content" name="text" placeholder="请输入文本内容...">{{ text }}</textarea>
+            <div id="text-error" class="error"></div>
+
+            <div class="voice-selector">
+                <label for="voice-select">选择音色:</label>
+                <select id="voice-select" name="voice">
+                    <option value="">加载中...</option>
+                </select>
+                <div id="voice-status" style="margin-top: 20px;"></div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">重新上传</button>
+                <button type="submit" class="btn">确认处理</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="/static/js/text.js"></script>
+</body>
+
+</html>
