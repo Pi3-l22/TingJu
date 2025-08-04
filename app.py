@@ -21,7 +21,7 @@ TEMP_FILE_PATH: Optional[Path] = None
 
 # 临时目录 导出目录
 TEMP_DIR = "temp"
-EXPORT_DIR = "export"
+EXPORT_DIR = "exports"
 
 # 存储当前的html和音频文件
 CURRENT_UUID: Optional[str] = None

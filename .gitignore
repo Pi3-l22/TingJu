@@ -17,3 +17,4 @@ audios/
 logs/
 *.log
 test_files/
+exports/
