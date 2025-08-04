@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>听句 TingJu - 英语听说学习神器</title>
+    <title>听句 TingJu - 英语听说学习工具</title>
     <link rel="icon" type="image/png" href="/static/img/favicon.png">
     <link rel="stylesheet" href="/static/css/text.css">
 </head>
@@ -29,11 +29,16 @@
                 <div id="voice-status" style="margin-top: 20px;"></div>
             </div>
 
-            <div class="button-group">
-                <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">重新上传</button>
-                <button type="submit" class="btn">确认处理</button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">🔄️重新上传</button>
+                <button type="submit" class="btn">👌确认处理</button>
             </div>
         </form>
+
+        <div id="loading-overlay" class="loading-overlay" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>🚀正在全力生成翻译和音频... 趁现在去喝杯☕咖啡吧...</p>
+        </div>
     </div>
 
     <script src="/static/js/text.js"></script>

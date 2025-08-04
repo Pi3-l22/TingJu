@@ -1,11 +1,12 @@
-import asyncio
-import os
 import uuid
+import atexit
+import shutil
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List, Dict
+from datetime import datetime as dt
 
 from fastapi import FastAPI, File, UploadFile, Form, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -15,10 +16,22 @@ from utils.text_translator import get_text_translated
 from utils.audio_generator import generate_audio, list_voices, AUDIO_DIR
 from utils.logger import logger
 
+# 存储临时文件路径的全局变量
+TEMP_FILE_PATH: Optional[Path] = None
+
+# 临时目录 导出目录
+TEMP_DIR = "temp"
+EXPORT_DIR = "export"
+
+# 存储当前的html和音频文件
+CURRENT_UUID: Optional[str] = None
+
 app = FastAPI()
 
 # 创建音频目录
 Path(AUDIO_DIR).mkdir(exist_ok=True)
+# 创建临时目录
+Path(TEMP_DIR).mkdir(exist_ok=True)
 
 # 挂载静态文件目录
 app.mount(f"/{AUDIO_DIR}", StaticFiles(directory=AUDIO_DIR), name=AUDIO_DIR)
@@ -31,21 +44,36 @@ templates = Jinja2Templates(directory="templates")
 # 初始化NLTK
 init_nltk()
 
-# 用于存储临时文件路径的全局变量
-TEMP_FILE_PATH: Optional[Path] = None
+def cleanup_temp_files():
+    """清理临时文件和音频文件"""
+    try:
+        # 清理temp目录
+        temp_dir = Path(TEMP_DIR)
+        if temp_dir.exists():
+            shutil.rmtree(temp_dir)
+            temp_dir.mkdir(exist_ok=True)
+            logger.info("temp文件夹已清理")
+        
+        # 清理audios目录
+        audio_dir = Path(AUDIO_DIR)
+        if audio_dir.exists():
+            shutil.rmtree(audio_dir)
+            audio_dir.mkdir(exist_ok=True)
+            logger.info("audios文件夹已清理")
+    except Exception as e:
+        logger.error(f"清理临时文件时出错: {e}")
+
+# 注册程序退出时的清理函数
+atexit.register(cleanup_temp_files)
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    """
-    根路由，返回工具介绍和文件上传页面
-    """
+    """根路由，返回工具介绍和文件上传页面"""
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/manual", response_class=HTMLResponse)
 async def manual_input(request: Request):
-    """
-    手动填写文本内容
-    """
+    """手动填写文本内容"""
     return templates.TemplateResponse("text.html", {
         "request": request,
         "text": ""  # 空文本，让用户自行填写
@@ -53,11 +81,9 @@ async def manual_input(request: Request):
 
 @app.post("/upload")
 async def upload_file(request: Request, file: UploadFile = File(...)):
-    """
-    处理文件上传，提取文本内容
-    """
+    """处理文件上传，提取文本内容"""
     # 创建临时文件保存上传的文件
-    temp_dir = Path("temp")
+    temp_dir = Path(TEMP_DIR)
     temp_dir.mkdir(exist_ok=True)
     
     # 生成唯一的文件名
@@ -98,9 +124,7 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
 
 @app.post("/generate")
 async def generate(request: Request, text: str = Form(...), voice: str = Form(...)):
-    """
-    处理用户确认的文本，进行分句、翻译和音频生成
-    """
+    """处理用户确认的文本，进行分句、翻译和音频生成"""
     try:
         # 对文本进行分句
         sentences = get_sentences(text)
@@ -129,7 +153,7 @@ async def generate(request: Request, text: str = Form(...), voice: str = Form(..
             results.append({
                 "sentence": sentence,
                 "translation": translation,
-                "audio_path": audio_path
+                "audio_path": str(audio_path).replace("\\", "/")  # 确保路径分隔符统一
             })
         
         # 清理临时文件
@@ -138,10 +162,17 @@ async def generate(request: Request, text: str = Form(...), voice: str = Form(..
             TEMP_FILE_PATH.unlink()
             TEMP_FILE_PATH = None
         
+        # 保存html文件 用于后续导出
+        save_html(title, {"results": results})
+        
+        # 保存当前的UUID标题
+        global CURRENT_UUID
+        CURRENT_UUID = title
+        
         # 返回结果页面
         return templates.TemplateResponse("results.html", {
             "request": request,
-            "results": results
+            "results": results,
         })
         
     except Exception as e:
@@ -154,15 +185,70 @@ async def generate(request: Request, text: str = Form(...), voice: str = Form(..
 
 @app.get("/voices")
 async def get_voices():
-    """
-    获取可用的音色列表
-    """
+    """获取可用的音色列表"""
     try:
         voices = await list_voices()
         return {"voices": voices}
     except Exception as e:
         logger.error(f"获取音色列表时出错: {str(e)}")
         return {"error": f"获取音色列表时出错: {str(e)}"}
+
+@app.get("/export")
+async def export_content():
+    """导出当前结果页面和音频文件"""
+    try:
+        # 创建导出目录
+        export_dir = Path(EXPORT_DIR)
+        export_dir.mkdir(exist_ok=True)
+        
+        # 创建一个文件夹存放本次导出的文件
+        export_folder = export_dir / f"Tingju_{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+        export_folder.mkdir(exist_ok=True)
+        index_html= Path(export_folder, "index.html")
+        css_dir = Path(export_folder, "css")
+        css_dir.mkdir(exist_ok=True)
+        js_dir = Path(export_folder, "js")
+        js_dir.mkdir(exist_ok=True)
+        img_dir = Path(export_folder, "img")
+        img_dir.mkdir(exist_ok=True)
+        audios_dir = Path(export_folder, AUDIO_DIR)
+        
+        # 将html css js favicon.png audios 复制到 export_folder 下
+        shutil.copy(Path(TEMP_DIR, f"{CURRENT_UUID}.html"), index_html)
+        shutil.copy(Path("static", "css", "common.css"), css_dir)
+        shutil.copy(Path("static", "css", "results.css"), css_dir)
+        shutil.copy(Path("static", "css", "theme.css"), css_dir)
+        shutil.copy(Path("static", "js", "results.js"), js_dir)
+        shutil.copy(Path("static", "img", "favicon.png"), img_dir)
+        shutil.copytree(Path(AUDIO_DIR), audios_dir)
+        
+        return {
+            "status": "success",
+            "message": f"成功接收到文件夹路径",
+            "path": f"{export_folder}"
+        }
+    except Exception as e:
+        logger.error(f"导出文件时出错: {str(e)}")
+        return {
+            "status": "error",
+            "message": str(e),
+            "path": ""
+        }
+
+def save_html(title: str, data: Dict[str, List[Dict[str, str]]]):
+    """保存HTML文件"""
+    try:
+        import jinja2
+        # 读取模板文件
+        template = jinja2.Template(open("templates/export_template.html", encoding="utf-8").read())
+        html_content = template.render(**data)
+        # 保存HTML文件到temp目录
+        html_file_path = Path(TEMP_DIR) / f"{title}.html"
+        with open(html_file_path, "w", encoding="utf-8") as f:
+            f.write(html_content)
+    except Exception as e:
+        logger.error(f"保存HTML文件失败: {e}")
+    
 
 if __name__ == "__main__":
     import uvicorn

@@ -28,7 +28,7 @@ def init_nltk():
         nltk.download('punkt_tab', download_dir=DATA_DIR)
         logger.info("punkt 和 punkt_tab 下载完成")
     
-def get_sentences(paragraph: str) -> list: 
+def get_sentences(paragraph: str) -> list[str]: 
     """将段落分成句子"""
     sentences = nltk.sent_tokenize(paragraph)
     # 如果句子字符数少于3个字符，则忽略
@@ -36,7 +36,7 @@ def get_sentences(paragraph: str) -> list:
     logger.debug(f"段落分割完成，共 {len(sentences)} 个句子")
     return sentences
 
-def get_words(sentence: str) -> list:
+def get_words(sentence: str) -> list[str]:
     words = nltk.word_tokenize(sentence)
     # 如果单词字符数少于2个字符，则忽略
     words = [w for w in words if len(w) > 1]

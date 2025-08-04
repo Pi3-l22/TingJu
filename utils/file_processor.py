@@ -6,6 +6,30 @@ from utils.logger import logger
 
 FILE_TYPES = ['.pdf', '.txt', '.docx', '.xlsx', '.pptx', '.svg', '.epub', '.mobi', '.xps', '.fb2', '.cbz']
 
+# 中文符号替换为英文符号
+chinese_to_english_punctuation = {
+    '“': '"',
+    '”': '"',
+    '‘': "'",
+    '’': "'",
+    '（': '(',
+    '）': ')',
+    '【': '[',
+    '】': ']',
+    '《': '<',
+    '》': '>',
+    '？': '?',
+    '；': ';',
+    '：': ':',
+    '，': ',',
+    '。': '.',
+    '！': '!',
+    '——': '-',  # 中文破折号
+    '－': '-',  # 中文连字符
+    '·': '.',  # 中点
+    '…': '...',  # 省略号
+}
+
 def extract_text_from_file(file_path: str) -> str:
     # 先检查文件类型是否正确，文件是否存在
     file = Path(file_path)
@@ -32,6 +56,9 @@ def extract_text_from_file(file_path: str) -> str:
         
         # 如果有连续的多个空格，则替换成单个空格
         text = re.sub(r"\s+", " ", text)
+        
+        for chinese_punct, english_punct in chinese_to_english_punctuation.items():
+            text = text.replace(chinese_punct, english_punct)
         
         logger.info(f"{file.name} 提取文字成功")
         return text

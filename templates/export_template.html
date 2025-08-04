@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>听句 TingJu - 英语听说学习工具</title>
-    <link rel="icon" type="image/png" href="/static/img/favicon.png">
-    <link rel="stylesheet" href="/static/css/results.css">
+    <link rel="icon" type="image/png" href="./img/favicon.png">
+    <link rel="stylesheet" href="./css/results.css">
 </head>
 
 <body>
@@ -14,7 +14,6 @@
         <h1><a href="https://github.com/Pi3-l22/TingJu" target="_blank">听句 TingJu</a></h1>
 
         <div class="tools-group">
-            <button class="export-btn">⚙️导出</button>
         </div>
 
         {% for item in results %}
@@ -24,7 +23,7 @@
             <input class="user-input" type="text" placeholder="播放音频，输入你听到的句子...">
             <div class=" audio-controls">
                 <audio controls class="audio-player">
-                    <source src="/{{ item.audio_path }}" type="audio/mpeg">
+                    <source src="./{{ item.audio_path }}" type="audio/mpeg">
                     <span class="warning">您的浏览器不支持音频播放，换一个浏览器试试</span>
                 </audio>
             </div>
@@ -32,14 +31,13 @@
         {% endfor %}
 
         <div class="btn-group">
-            <button class="btn" onclick="window.location.href='/'">💡学新内容</button>
             <button class="btn btn-secondary clear-btn" style="display: none;">♾️清空重听</button>
             <button class="btn dictation-btn">✒️听写模式</button>
             <button class="btn read-btn" style="display: none;">📖听读模式</button>
         </div>
     </div>
 
-    <script src="/static/js/results.js"></script>
+    <script src="./js/results.js"></script>
 </body>
 
 </html>

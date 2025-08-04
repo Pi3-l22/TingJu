@@ -1,0 +1,135 @@
+@import url("./theme.css");
+
+body {
+	font-family: var(--text-sans-font);
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 20px;
+	background-color: var(--body-bg-color);
+}
+
+.container {
+	background-color: var(--container-bg-color);
+	padding: 30px;
+	border-radius: var(--border-radius);
+	box-shadow: var(--box-shadow);
+}
+
+h1 {
+	color: var(--text-primary-color);
+	text-align: center;
+	font-size: 40px;
+	font-family: var(--title-font);
+}
+
+a {
+	color: var(--text-primary-color);
+	text-decoration: none;
+}
+
+.description {
+	margin-bottom: 20px;
+	line-height: 1.6;
+}
+
+.description ul {
+	text-align: left;
+}
+
+.btn {
+	background-color: var(--primary-color);
+	color: var(--text-light-color);
+	padding: 8px 16px;
+	border: none;
+	border-radius: var(--border-radius);
+	cursor: pointer;
+	font-size: 16px;
+	transition: var(--transition);
+}
+
+.btn:hover {
+	background-color: var(--primary-hover-color);
+}
+
+.btn:disabled {
+	background-color: var(--secondary-color);
+	cursor: not-allowed;
+}
+
+.btn-secondary {
+	background-color: var(--secondary-color);
+}
+
+.btn-secondary:hover {
+	background-color: var(--secondary-hover-color);
+}
+
+.btn-group {
+	display: flex;
+	justify-content: space-around;
+}
+
+.loading {
+	color: var(--primary-color);
+	font-style: bold;
+	margin-top: 15px;
+	padding: 5px 10px;
+	border: 1px solid var(--primary-color);
+	border-radius: var(--border-radius);
+	background-color: var(--primary-bg-color);
+	display: none; /* 默认隐藏 */
+}
+
+.loading:not(:empty) {
+	display: block; /* 当有内容时显示 */
+}
+
+.error {
+	color: var(--error-color);
+	font-weight: bold;
+	margin-top: 15px;
+	padding: 5px 10px;
+	border: 1px solid var(--error-color);
+	border-radius: var(--border-radius);
+	background-color: var(--error-bg-color);
+	display: none; /* 默认隐藏 */
+}
+
+.error:not(:empty) {
+	display: block; /* 当有内容时显示 */
+}
+
+.warning {
+	color: var(--warning-color);
+	font-weight: bold;
+	margin-top: 15px;
+	padding: 5px 10px;
+	border: 1px solid var(--warning-color);
+	border-radius: var(--border-radius);
+	background-color: var(--warning-bg-color);
+	display: none; /* 默认隐藏 */
+}
+
+.warning:not(:empty) {
+	display: block; /* 当有内容时显示 */
+}
+
+/* 适配移动端 */
+@media (max-width: 768px) {
+	body {
+		max-width: 100%;
+		margin: 0 auto;
+		padding: 10px;
+	}
+
+	.container {
+		padding: 10px;
+		background-color: var(--body-bg-color);
+		border-radius: 0;
+		box-shadow: 0 0 0;
+	}
+
+	.btn {
+		font-size: 14px;
+	}
+}

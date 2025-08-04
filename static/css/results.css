@@ -1,91 +1,99 @@
-@import url('./theme.css');
+@import url("./common.css");
 
 body {
-    font-family: Arial, sans-serif;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: var(--body-bg-color);
-}
-
-.container {
-    background-color: var(--container-bg-color);
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px var(--shadow-color);
-}
-
-h1 {
-    color: var(--text-primary-color);
-    text-align: center;
+	max-width: 1000px;
 }
 
 .description {
-    margin-bottom: 30px;
-    line-height: 1.6;
-    text-align: center;
+	margin-bottom: 30px;
+	text-align: center;
 }
 
 .result-item {
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    padding: 20px;
-    margin-bottom: 20px;
-    background-color: var(--item-bg-color);
+	border: 2px solid var(--border-color);
+	border-radius: var(--border-radius);
+	padding: 20px;
+	margin-bottom: 20px;
+	transition: var(--transition);
+}
+
+.result-item:hover {
+	border: 2px dashed var(--primary-color);
 }
 
 .sentence {
-    font-size: 18px;
-    margin-bottom: 15px;
-    color: var(--text-primary-color);
+	line-height: 1.5;
+	font-size: 20px;
+	margin-bottom: 20px;
+	color: var(--text-primary-color);
+	padding: 15px;
+	background-color: var(--primary-bg-color);
+	border-radius: var(--border-radius);
+	transition: var(--transition);
 }
 
 .translation {
-    font-size: 16px;
-    color: var(--text-secondary-color);
-    margin-bottom: 15px;
-    padding: 10px;
-    background-color: var(--highlight-bg-color);
-    border-radius: 5px;
+	line-height: 1.5;
+	font-size: 16px;
+	color: var(--text-secondary-color);
+	margin-bottom: 20px;
+	padding: 15px;
+	background-color: var(--item-bg-color);
+	border-radius: var(--border-radius);
+	transition: var(--transition);
 }
 
-.audio-controls {
-    margin-top: 10px;
+.blurry {
+	filter: blur(10px);
 }
 
-.btn {
-    background-color: var(--primary-color);
-    color: var(--text-light-color);
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
-}
-
-.btn:hover {
-    background-color: var(--primary-hover-color);
-}
-
-.btn-secondary {
-    background-color: var(--secondary-color);
-}
-
-.btn-secondary:hover {
-    background-color: var(--secondary-hover-color);
-}
-
-.button-group {
-    text-align: center;
-    margin-top: 30px;
-}
-
-.button-group .btn {
-    margin: 0 10px;
+.blurry:hover {
+	filter: blur(0);
 }
 
 .audio-player {
-    width: 100%;
-    margin-top: 10px;
+	width: 100%;
+}
+
+.audio-player::-webkit-media-controls-panel {
+	background-color: var(--container-bg-color);
+}
+
+.user-input {
+	display: none;
+	width: 100%;
+	font-family: var(--mono-font);
+	font-size: 16px;
+	color: var(--text-primary-color);
+	padding: 15px;
+	margin-bottom: 20px;
+	border-radius: var(--border-radius);
+	border: 1px solid var(--border-color);
+	outline-color: var(--primary-color);
+	box-sizing: border-box;
+	transition: var(--transition);
+}
+
+.btn-group {
+	margin-top: 30px;
+}
+
+.export-btn {
+	color: var(--primary-color);
+	padding: 5px 10px;
+	border: 2px solid var(--primary-color);
+	border-radius: var(--border-radius);
+	cursor: pointer;
+	font-size: 16px;
+	transition: var(--transition);
+}
+
+.tools-group {
+	margin: 20px auto;
+}
+
+@media (max-width: 768px) {
+	.sentence {
+		font-size: 18px;
+	}
 }

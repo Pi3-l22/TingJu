@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>听句 TingJu - 英语听说学习神器</title>
+    <title>听句 TingJu - 英语听说学习工具</title>
     <link rel="icon" type="image/png" href="/static/img/favicon.png">
     <link rel="stylesheet" href="/static/css/index.css">
 </head>
@@ -25,20 +25,23 @@
                 <li>🔊 <strong>标准发音</strong>：使用<strong>Edge官方英文音色</strong>，还原标准地道的英文发音</li>
             </ul>
             <hr>
-            <p style="text-align: center;">🚀 Go！点击下方 👇 开始学习，祝学习愉快！</p>
+            <p style="text-align: center;">🚀Go！点击下方👇开始学习，祝学习愉快！</p>
         </div>
 
         <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
             <div class="upload-area" id="drop-area">
-                <p>将文件拖拽到此处或点击选择文件</p>
+                <p>
+                    将文件拖拽到此处或点击选择文件<br>
+                    <span class="info">支持pdf、txt、docx、xlsx、pptx、svg、epub、mobi、xps、fb2、cbz文件格式</span>
+                </p>
                 <input type="file" id="file-input" name="file" class="file-input"
                     accept=".pdf,.txt,.docx,.xps,.epub,.mobi,.fb2,.cbz,.svg,.xlsx,.pptx" style="display: none;">
-                <button type="button" class="btn" id="browse-btn">选择文件</button>
+                <button type="button" class="btn" id="browse-btn">📁选择文件</button>
                 <div id="file-name"></div>
             </div>
             <div class="btn-group">
-                <button type="submit" class="btn" id="upload-btn" disabled>上传识别</button>
-                <button type="button" class="btn" id="manual-btn">手动填写</button>
+                <button type="button" class="btn" id="manual-btn">✍️手动填写</button>
+                <button type="submit" class="btn" id="upload-btn" disabled>📄上传识别</button>
             </div>
         </form>
     </div>

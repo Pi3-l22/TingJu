@@ -55,7 +55,7 @@ async function populateVoices() {
         // 添加默认选项
         const defaultOption = document.createElement('option');
         defaultOption.value = 'en-US-ChristopherNeural';
-        defaultOption.textContent = '默认 - ChristopherNeural (男声)';
+        defaultOption.textContent = '默认 - ChristopherNeural (男)';
         voiceSelect.appendChild(defaultOption);
 
         // 添加其他音色选项
@@ -90,11 +90,11 @@ async function populateVoices() {
     }
 }
 
-// 添加文本验证功能
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('confirm-form');
     const textArea = document.getElementById('text-content');
     const errorDiv = document.getElementById('text-warning');
+    const loadingOverlay = document.getElementById('loading-overlay');
 
     if (form && textArea && errorDiv) {
         form.addEventListener('submit', function (e) {
@@ -115,6 +115,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 errorDiv.textContent = '文本内容至少需要10个字符';
                 e.preventDefault();
                 return false;
+            }
+
+            // 显示加载动画
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'flex';
             }
 
             return true;
