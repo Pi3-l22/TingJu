@@ -26,6 +26,12 @@
             <button class="export-btn tool-btn">⚙️导出</button>
         </div>
 
+        <div id="status-info">
+            {% if warning %}
+            <span class="warning">⚠ {{ warning }}</span>
+            {% endif %}
+        </div>
+
         {% for item in results %}
         <div class="result-item">
             <div class="sentence"><strong>{{ loop.index }}. </strong> {{ item.sentence }}</div>

@@ -130,7 +130,7 @@ async def generate(request: Request, text: str = Form(...), voice: str = Form(..
             return templates.TemplateResponse("text.html", {
                 "request": request,
                 "text": text,
-                "error": "未能从文本中分割出句子，请检查文本内容。"
+                "error": "未能从文本中分割出句子，请仔细检查文本内容"
             })
         
         # 生成标题（用于音频文件夹名称）
@@ -141,7 +141,7 @@ async def generate(request: Request, text: str = Form(...), voice: str = Form(..
         
         # 生成音频
         voice_name = voice if voice else "en-US-ChristopherNeural"
-        audio_dir, audio_filenames = await generate_audio(sentences, voice_name, title)
+        audio_dir, audio_filenames, warning_msg = await generate_audio(sentences, voice_name, title)
         
         # 构建结果列表
         results = []
@@ -167,17 +167,23 @@ async def generate(request: Request, text: str = Form(...), voice: str = Form(..
         CURRENT_UUID = title
         
         # 返回结果页面
+        if warning_msg:
+            return templates.TemplateResponse("results.html", {
+                "request": request,
+                "results": results,
+                "warning": warning_msg
+            })
         return templates.TemplateResponse("results.html", {
             "request": request,
-            "results": results,
+            "results": results
         })
         
     except Exception as e:
-        logger.error(f"处理文本时出错: {str(e)}")
+        logger.error(f"生成过程中发生错误: {str(e)}")
         return templates.TemplateResponse("text.html", {
             "request": request,
             "text": text,
-            "error": f"处理文本时出错: {str(e)}"
+            "error": f"生成过程中发生错误: {str(e)}"
         })
 
 @app.get("/voices")

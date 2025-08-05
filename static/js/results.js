@@ -132,18 +132,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // 清空所有输入框的内容
             inputElements.forEach(input => {
-                // 恢复默认样式
-                input.style.backgroundColor = '';
-                input.style.borderColor = '';
-                input.style.outlineColor = 'var(--primary-color)';
-
                 // 获取对应的句子和翻译元素
                 const resultItem = input.closest('.result-item');
                 const sentenceElement = resultItem.querySelector('.sentence');
                 const translationElement = resultItem.querySelector('.translation');
 
-                // 清空输入框内容并添加模糊效果
+                // 恢复默认样式
                 input.value = '';
+                input.style.backgroundColor = '';
+                input.style.borderColor = '';
+                input.style.outlineColor = 'var(--primary-color)';
+
+                // 添加模糊效果
                 sentenceElement.classList.add('blurry');
                 translationElement.classList.add('blurry');
             });
@@ -201,20 +201,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const exportBtn = document.querySelector('.export-btn');
     if (exportBtn) {
         exportBtn.addEventListener('click', async function () {
+            const infoDiv = document.getElementById('status-info');
             try {
                 const response = await fetch('/export');
                 if (response.ok) {
                     const result = await response.json();
                     if (result.status === 'success') {
-                        alert('✅导出成功！文件已保存到: ' + result.path);
+                        infoDiv.innerHTML = '<span class="success">✅ 导出成功！文件已保存到运行目录下: ' + result.path + '</span>';
                     } else {
-                        alert('❌导出失败: ' + result.message);
+                        infoDiv.innerHTML = '<span class="error">‼ 导出失败: ' + result.message + '</span>';
                     }
                 } else {
-                    alert('❌导出请求失败');
+                    infoDiv.innerHTML = '<span class="error">‼ 导出请求失败: ' + response.status + ' ' + response.statusText + '</span>';
                 }
             } catch (error) {
-                alert('❌导出过程中出错: ' + error.message);
+                infoDiv.innerHTML = '<span class="error">‼ 导出过程出错: ' + error.message + '</span>';
             }
         });
     }

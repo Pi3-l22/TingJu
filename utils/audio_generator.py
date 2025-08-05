@@ -25,7 +25,7 @@ async def list_voices(locale: str = 'en-US') -> list:
     logger.info(f"共找到 {locale} 语言的 {len(voices_list)} 个可用音色")
     return voices_list
 
-async def generate_audio(text_list: List[str], voice_name: str, title: str) -> Tuple[Path, List[str]]:
+async def generate_audio(text_list: List[str], voice_name: str, title: str) -> Tuple[Path, List[str], str]:
     """生成音频(异步)，返回音频目录路径和生成的文件名列表"""
     logger.info(f"正在生成音频文件，音色为 {voice_name} ...")
     audio_dir = _check_audio_dir(title)
@@ -40,16 +40,23 @@ async def generate_audio(text_list: List[str], voice_name: str, title: str) -> T
         tasks.append(task)
     results = await asyncio.gather(*tasks, return_exceptions=True)
     
+    warning_msg = ""
+    warning_num = []
+    
     # 检查执行结果，记录任何可能的异常
     success_count = 0
     for i, result in enumerate(results):
         if isinstance(result, Exception):
+            warning_num.append(i+1)
             logger.error(f"生成第 {i+1} 个音频时出错: {result}")
         else:
             success_count += 1
     
+    if warning_num:
+        warning_msg = f"第 {','.join(map(str, warning_num))} 个音频生成失败，请检查日志信息，尝试换个音色重新生成"
+    
     logger.info(f"共 {success_count}/{len(text_list)} 条音频生成完成，保存在 {audio_dir}")
-    return audio_dir, filenames
+    return audio_dir, filenames, warning_msg
     
 def generate_audio_sync(text_list: List[str], voice_name: str, title: str) -> Tuple[Path, List[str]]:
     """生成音频(同步)，返回音频目录路径和生成的文件名列表"""

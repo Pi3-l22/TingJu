@@ -108,6 +108,10 @@ body {
 	justify-content: space-between;
 }
 
+#status-info {
+	margin-bottom: 20px;
+}
+
 /* 主题选择器样式 */
 .theme-selector-container {
 	position: relative;
@@ -180,12 +184,14 @@ body {
 
 @media (max-width: 768px) {
 	.sentence {
-		font-size: 18px;
+		font-size: 16px;
 	}
 
 	.result-item {
 		padding: 10px;
-		margin-bottom: 15px;
+		margin-bottom: 20px;
+		background-color: var(--container-bg-color);
+		box-shadow: var(--box-shadow);
 	}
 
 	.sentence {
