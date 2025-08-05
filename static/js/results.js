@@ -92,11 +92,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // 清空所有输入框的内容
             inputElements.forEach(input => {
-                input.value = '';
                 // 恢复默认样式
                 input.style.backgroundColor = '';
                 input.style.borderColor = '';
                 input.style.outlineColor = 'var(--primary-color)';
+
+                // 获取对应的句子和翻译元素
+                const resultItem = input.closest('.result-item');
+                const sentenceElement = resultItem.querySelector('.sentence');
+                const translationElement = resultItem.querySelector('.translation');
+
+                // 清空输入框内容并添加模糊效果
+                input.value = '';
+                sentenceElement.classList.add('blurry');
+                translationElement.classList.add('blurry');
             });
 
             // 滚动到页面顶部

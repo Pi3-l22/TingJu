@@ -21,7 +21,7 @@
         <div class="result-item">
             <div class="sentence"><strong>{{ loop.index }}. </strong> {{ item.sentence }}</div>
             <div class="translation">{{ item.translation }}</div>
-            <input class="user-input" type="text" placeholder="播放音频，输入你听到的句子...">
+            <input class="user-input" type="text" placeholder="播放音频，听写句子...">
             <div class=" audio-controls">
                 <audio controls class="audio-player">
                     <source src="/{{ item.audio_path }}" type="audio/mpeg">
@@ -33,7 +33,7 @@
 
         <div class="btn-group">
             <button class="btn" onclick="window.location.href='/'">💡学新内容</button>
-            <button class="btn btn-secondary clear-btn" style="display: none;">♾️清空重听</button>
+            <button class="btn btn-secondary clear-btn" style="display: none;">🔁清空重听</button>
             <button class="btn dictation-btn">✒️听写模式</button>
             <button class="btn read-btn" style="display: none;">📖听读模式</button>
         </div>

@@ -96,4 +96,19 @@ body {
 	.sentence {
 		font-size: 18px;
 	}
+
+	.result-item {
+		padding: 10px;
+		margin-bottom: 15px;
+	}
+
+	.sentence {
+		margin-bottom: 10px;
+	}
+	.translation {
+		margin-bottom: 10px;
+	}
+	.user-input {
+		margin-bottom: 10px;
+	}
 }

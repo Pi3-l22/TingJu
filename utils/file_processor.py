@@ -3,32 +3,9 @@ from pathlib import Path
 
 import pymupdf
 from utils.logger import logger
+from utils.text_processor import normalize_text
 
 FILE_TYPES = ['.pdf', '.txt', '.docx', '.xlsx', '.pptx', '.svg', '.epub', '.mobi', '.xps', '.fb2', '.cbz']
-
-# 中文符号替换为英文符号
-chinese_to_english_punctuation = {
-    '“': '"',
-    '”': '"',
-    '‘': "'",
-    '’': "'",
-    '（': '(',
-    '）': ')',
-    '【': '[',
-    '】': ']',
-    '《': '<',
-    '》': '>',
-    '？': '?',
-    '；': ';',
-    '：': ':',
-    '，': ',',
-    '。': '.',
-    '！': '!',
-    '——': '-',  # 中文破折号
-    '－': '-',  # 中文连字符
-    '·': '.',  # 中点
-    '…': '...',  # 省略号
-}
 
 def extract_text_from_file(file_path: str) -> str:
     # 先检查文件类型是否正确，文件是否存在
@@ -54,16 +31,13 @@ def extract_text_from_file(file_path: str) -> str:
             text += page_str
             logger.debug(f"{file.name} 页 {page.number} 提取文字成功")
         
-        # 如果有连续的多个空格，则替换成单个空格
-        text = re.sub(r"\s+", " ", text)
+        # 规范化文本
+        text = normalize_text(text)
         
-        for chinese_punct, english_punct in chinese_to_english_punctuation.items():
-            text = text.replace(chinese_punct, english_punct)
-        
-        logger.info(f"{file.name} 提取文字成功")
+        logger.info(f"{file.name} 提取文字完成")
         return text
     except Exception as e:
-        logger.error(f"处理 {file_path} 文件时出错: {str(e)}")
+        logger.error(f"{file_path} 提取文字出错: {str(e)}")
         return ""
     finally:
         try:

@@ -1,11 +1,10 @@
 import logging
-import os
 from pathlib import Path
 
 # 日志目录
 LOG_DIR = "logs"
 
-def setup_logger(name: str = "tingju", log_level: int = logging.INFO) -> logging.Logger:
+def setup_logger(name: str = "TingJu", log_level: int = logging.INFO) -> logging.Logger:
     """设置并返回一个日志记录器"""
     # 创建日志目录
     log_dir = Path(LOG_DIR)
@@ -27,11 +26,14 @@ def setup_logger(name: str = "tingju", log_level: int = logging.INFO) -> logging
         console_handler.setLevel(log_level)
         
         # 创建格式器并添加到处理器
-        formatter = logging.Formatter(
+        file_formatter = logging.Formatter(
             '%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s'
         )
-        file_handler.setFormatter(formatter)
-        console_handler.setFormatter(formatter)
+        console_formatter = logging.Formatter(
+            '%(levelname)s:     %(message)s'
+        )
+        file_handler.setFormatter(file_formatter)
+        console_handler.setFormatter(console_formatter)
         
         # 添加处理器到日志记录器
         logger.addHandler(file_handler)

@@ -11,6 +11,7 @@ AUDIO_DIR = "audios"
 
 async def list_voices(locale: str = 'en-US') -> list:
     """列出指定语言的可用音色"""
+    logger.info(f"正在获取 {locale} 语言的音色列表...")
     voices_list = []
     voices = await VoicesManager.create()
     _voices_list = voices.find(Locale=locale)
@@ -21,11 +22,12 @@ async def list_voices(locale: str = 'en-US') -> list:
             # VoiceTag': {'ContentCategories': ['Conversation', 'Copilot'], 'VoicePersonalities': ['Expressive', 'Caring', 'Pleasant', 'Friendly']}
             "style": voice["VoiceTag"]["ContentCategories"] + voice["VoiceTag"]["VoicePersonalities"],
         })
-    logger.info(f"共找到 '{locale}' 语言的 {len(voices_list)} 个可用音色")
+    logger.info(f"共找到 {locale} 语言的 {len(voices_list)} 个可用音色")
     return voices_list
 
 async def generate_audio(text_list: List[str], voice_name: str, title: str) -> Tuple[Path, List[str]]:
     """生成音频(异步)，返回音频目录路径和生成的文件名列表"""
+    logger.info(f"正在生成音频文件，音色为 {voice_name} ...")
     audio_dir = _check_audio_dir(title)
     filenames = []
     tasks = []
@@ -46,11 +48,12 @@ async def generate_audio(text_list: List[str], voice_name: str, title: str) -> T
         else:
             success_count += 1
     
-    logger.info(f"{success_count}/{len(text_list)} 条音频生成完成，音色为 {voice_name}，保存在 {audio_dir}")
+    logger.info(f"共 {success_count}/{len(text_list)} 条音频生成完成，保存在 {audio_dir}")
     return audio_dir, filenames
     
 def generate_audio_sync(text_list: List[str], voice_name: str, title: str) -> Tuple[Path, List[str]]:
     """生成音频(同步)，返回音频目录路径和生成的文件名列表"""
+    logger.info(f"正在生成音频文件，音色为 {voice_name} ...")
     audio_dir = _check_audio_dir(title)
     filenames = []
     success_count = 0
@@ -64,7 +67,7 @@ def generate_audio_sync(text_list: List[str], voice_name: str, title: str) -> Tu
             success_count += 1
         except Exception as e:
             logger.error(f"生成第 {i+1} 个音频时出错: {e}")
-    logger.info(f"{success_count}/{len(text_list)} 条音频生成完成，音色为 {voice_name}，保存在 {audio_dir}")
+    logger.info(f"共 {success_count}/{len(text_list)} 条音频生成完成，保存在 {audio_dir}")
     return audio_dir, filenames
 
 def _get_filename(text: str) -> str:

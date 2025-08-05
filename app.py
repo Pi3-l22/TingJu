@@ -23,8 +23,8 @@ TEMP_FILE_PATH: Optional[Path] = None
 TEMP_DIR = "temp"
 EXPORT_DIR = "exports"
 
-# 存储当前的html和音频文件
-CURRENT_UUID: Optional[str] = None
+# 存储当前的UUID
+CURRENT_UUID: str = ""
 
 app = FastAPI()
 
@@ -41,9 +41,6 @@ app.mount("/templates", StaticFiles(directory="templates"), name="templates")
 # 配置模板
 templates = Jinja2Templates(directory="templates")
 
-# 初始化NLTK
-init_nltk()
-
 def cleanup_temp_files():
     """清理临时文件和音频文件"""
     try:
@@ -52,14 +49,14 @@ def cleanup_temp_files():
         if temp_dir.exists():
             shutil.rmtree(temp_dir)
             temp_dir.mkdir(exist_ok=True)
-            logger.info("temp文件夹已清理")
+            logger.info("temp 文件夹已清理")
         
         # 清理audios目录
         audio_dir = Path(AUDIO_DIR)
         if audio_dir.exists():
             shutil.rmtree(audio_dir)
             audio_dir.mkdir(exist_ok=True)
-            logger.info("audios文件夹已清理")
+            logger.info("audios 文件夹已清理")
     except Exception as e:
         logger.error(f"清理临时文件时出错: {e}")
 
@@ -202,7 +199,7 @@ async def export_content():
         export_dir.mkdir(exist_ok=True)
         
         # 创建一个文件夹存放本次导出的文件
-        export_folder = export_dir / f"Tingju_{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+        export_folder = export_dir / f"TingJu_{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}"
         export_folder.mkdir(exist_ok=True)
         index_html= Path(export_folder, "index.html")
         css_dir = Path(export_folder, "css")
@@ -212,6 +209,7 @@ async def export_content():
         img_dir = Path(export_folder, "img")
         img_dir.mkdir(exist_ok=True)
         audios_dir = Path(export_folder, AUDIO_DIR)
+        audios_dir.mkdir(exist_ok=True)
         
         # 将html css js favicon.png audios 复制到 export_folder 下
         shutil.copy(Path(TEMP_DIR, f"{CURRENT_UUID}.html"), index_html)
@@ -220,7 +218,7 @@ async def export_content():
         shutil.copy(Path("static", "css", "theme.css"), css_dir)
         shutil.copy(Path("static", "js", "results.js"), js_dir)
         shutil.copy(Path("static", "img", "favicon.png"), img_dir)
-        shutil.copytree(Path(AUDIO_DIR), audios_dir)
+        shutil.copytree(Path(AUDIO_DIR, CURRENT_UUID), Path(audios_dir, CURRENT_UUID))
         
         return {
             "status": "success",
@@ -248,8 +246,67 @@ def save_html(title: str, data: Dict[str, List[Dict[str, str]]]):
             f.write(html_content)
     except Exception as e:
         logger.error(f"保存HTML文件失败: {e}")
-    
+        
+def get_local_ips():
+    """获取所有有效的本地IP地址"""
+    import socket
+    ips = []
+    try:
+        # 尝试创建一个UDP连接来获取本地IP
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            # 连接到一个远程地址（不会真正发送数据）
+            s.connect(("8.8.8.8", 80))
+            local_ip = s.getsockname()[0]
+            if local_ip not in ips:
+                ips.append(local_ip)
+                
+        # 获取所有网络接口的IP地址
+        hostname = socket.gethostname()
+        host_ip = socket.gethostbyname(hostname)
+        ips.append(host_ip)
 
+    except Exception as e:
+        logger.warning(f"获取本地IP地址时出错: {e}")
+        
+    return ips
+
+def open_browser(url: str):
+    """自动打开浏览器访问服务"""
+    import webbrowser
+    import time
+    time.sleep(2) # 等待2秒，确保服务启动完成
+    try:
+        webbrowser.open(url)
+    except Exception as e:
+        logger.warning(f"自动打开浏览器时出错: {e}")
+        
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, port=51122)
+    import threading
+    
+    try:
+        print("--------------------------------------------------")
+        
+        print("🚀 TingJu 服务启动中...")
+        print("👇 可以通过以下地址访问服务:")
+        print("💻 本地地址: http://127.0.0.1:51122")
+        
+        # 获取所有本地IP地址
+        local_ips = get_local_ips()
+        for ip in local_ips:
+            print(f"🌐 网络地址: http://{ip}:51122")
+        
+        print("--------------------------------------------------")
+        
+        # 初始化NLTK
+        init_nltk()
+        
+        # 启动浏览器
+        threading.Thread(target=open_browser, args=("http://127.0.0.1:51122",), daemon=True).start()
+        
+        try:
+            uvicorn.run(app, host="0.0.0.0", port=51122)
+        except KeyboardInterrupt:
+            print("👋 TingJu 服务已停止")
+    except Exception as e:
+        logger.error(f"服务启动失败: {e}")

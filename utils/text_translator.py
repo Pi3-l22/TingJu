@@ -12,7 +12,7 @@ def init_translators():
 
 def get_text_translated(text_list: List[str], from_lang: str = 'en', to_lang: str = 'zh') -> List[str]:
     """获取文本的翻译, 失败时尝试其他翻译器"""
-    logger.info(f"开始翻译 {len(text_list)} 条文本")
+    logger.info(f"正在翻译 {len(text_list)} 条文本...")
     translated_text = []
     success_count = 0
     for text in text_list:
@@ -30,7 +30,7 @@ def get_text_translated(text_list: List[str], from_lang: str = 'en', to_lang: st
                 success_count += 1
                 break  # 成功就跳出循环
             except Exception as e:
-                logger.warning(f"{translator} 翻译失败 {text[:10]}... 原因: {e}")
+                logger.warning(f"使用 {translator} 翻译 {text} 时失败，原因: {e}")
                 continue
         
         if translated is not None:
@@ -39,5 +39,5 @@ def get_text_translated(text_list: List[str], from_lang: str = 'en', to_lang: st
             logger.error(f"{text[:20]}... 翻译失败")
             translated_text.append(text + " 翻译失败")
 
-    logger.info(f"{success_count}/{len(translated_text)} 条文本翻译完成")
+    logger.info(f"共 {success_count}/{len(translated_text)} 条文本翻译完成")
     return translated_text
