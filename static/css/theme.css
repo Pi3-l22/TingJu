@@ -48,3 +48,96 @@
 	--text-sans-font: "Noto Sans SC", sans-serif;
 	--text-serif-font: "Noto Serif SC", serif;
 }
+
+[data-theme="dark"] {
+	/* 主要颜色 .*/
+	--primary-color: #cba6f7;
+	--primary-bg-color: rgba(203, 166, 247, 0.3);
+	--primary-hover-color: #9177b1;
+	--secondary-color: #969a9e;
+	--secondary-hover-color: #565d64;
+
+	/* 背景颜色 */
+	--body-bg-color: #11111b;
+	--container-bg-color: #2a2b3c;
+	--item-bg-color: #181825;
+
+	/* 文字颜色 */
+	--text-primary-color: #cdd6f4;
+	--text-secondary-color: #8f99b2;
+	--text-light-color: #11111b;
+
+	/* 边框和阴影 */
+	--border-color: #64676d;
+	--box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+
+	/* 状态颜色 */
+	--success-color: #caffbf;
+	--success-bg-color: rgba(202, 255, 191, 0.1);
+	--error-color: #ffadad;
+	--error-bg-color: rgba(255, 173, 173, 0.1);
+	--warning-color: #fdffb6;
+	--warning-bg-color: rgba(253, 255, 182, 0.1);
+}
+
+[data-theme="pink"] {
+	/* 主要颜色 .*/
+	--primary-color: #f6b2ce;
+	--primary-bg-color: rgba(239, 196, 214, 0.5);
+	--primary-hover-color: #d3aebd;
+	--secondary-color: #b2b6b8;
+	--secondary-hover-color: #919395;
+
+	/* 背景颜色 */
+	--body-bg-color: #fee3de;
+	--container-bg-color: #fff6e6;
+	--item-bg-color: #eeeeee;
+
+	/* 文字颜色 */
+	--text-primary-color: #272343;
+	--text-secondary-color: #4e535f;
+	--text-light-color: #11111b;
+
+	/* 边框和阴影 */
+	--border-color: #dddddd;
+	--box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
+	/* 状态颜色 */
+	--success-color: #34a853;
+	--success-bg-color: #e3f9e9;
+	--error-color: #ea4335;
+	--error-bg-color: #fde8e5;
+	--warning-color: #ffa502;
+	--warning-bg-color: #fff3e0;
+}
+
+[data-theme="blue"] {
+	/* 主要颜色 .*/
+	--primary-color: #abc4ff;
+	--primary-bg-color: rgba(171, 196, 255, 0.5);
+	--primary-hover-color: #96aada;
+	--secondary-color: #b2b6b8;
+	--secondary-hover-color: #919395;
+
+	/* 背景颜色 */
+	--body-bg-color: #d7e3fc;
+	--container-bg-color: #edf2fa;
+	--item-bg-color: #eeeeee;
+
+	/* 文字颜色 */
+	--text-primary-color: #272343;
+	--text-secondary-color: #4e535f;
+	--text-light-color: #11111b;
+
+	/* 边框和阴影 */
+	--border-color: #dddddd;
+	--box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
+	/* 状态颜色 */
+	--success-color: #34a853;
+	--success-bg-color: #e3f9e9;
+	--error-color: #ea4335;
+	--error-bg-color: #fde8e5;
+	--warning-color: #ffa502;
+	--warning-bg-color: #fff3e0;
+}

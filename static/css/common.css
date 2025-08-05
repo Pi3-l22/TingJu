@@ -6,6 +6,8 @@ body {
 	margin: 0 auto;
 	padding: 20px;
 	background-color: var(--body-bg-color);
+	color: var(--text-primary-color);
+	transition: var(--transition);
 }
 
 .container {

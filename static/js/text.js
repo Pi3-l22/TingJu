@@ -39,13 +39,13 @@ async function populateVoices() {
     if (!voiceSelect || !voiceStatus) return;
 
     try {
-        voiceStatus.innerHTML = '<span class="loading">正在加载音色列表...</span>';
+        voiceStatus.innerHTML = '<span class="loading">◌ 正在加载音色列表...</span>';
 
         // 等待音色列表获取完成
         const data = await voicesPromise;
 
         if (data.error) {
-            voiceStatus.innerHTML = '<span class="error">加载音色列表失败: ' + data.error + '</span>';
+            voiceStatus.innerHTML = '<span class="error">‼ 加载音色列表失败: ' + data.error + '</span>';
             return;
         }
 
@@ -85,7 +85,7 @@ async function populateVoices() {
 
         voiceStatus.innerHTML = '';
     } catch (error) {
-        voiceStatus.innerHTML = '<span class="error">加载音色列表时出错: ' + error.message + '</span>';
+        voiceStatus.innerHTML = '<span class="error">‼ 加载音色列表时出错: ' + error.message + '</span>';
         voiceSelect.innerHTML = '<option value="en-US-ChristopherNeural">默认 - ChristopherNeural (男)</option>';
     }
 }
@@ -105,17 +105,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // 检查文本是否为空
             if (!text) {
-                errorDiv.textContent = '文本内容不能为空';
+                errorDiv.textContent = '⚠ 文本内容不能为空';
                 e.preventDefault();
                 return false;
             }
 
             // 检查文本长度是否足够
             if (text.length < 10) {
-                errorDiv.textContent = '文本内容至少需要10个字符';
+                errorDiv.textContent = '⚠ 文本内容至少需要10个字符';
                 e.preventDefault();
                 return false;
             }
+
+            // 检测文本是否有中文，防止翻译错误
+            if (/\p{Script=Han}/u.test(text)) {
+                errorDiv.textContent = '⚠ 文本中似乎有中文字符';
+                e.preventDefault();
+                return false;
+            }
+
+            // 检测文本是否为英文
+            // if (!/[^A-Za-z0-9\s.,!?;:()'"—–\-\/\[\]{}<>]/u.test(text)) {
+            //     errorDiv.textContent = '⚠ 文本中似乎有非英文字符';
+            //     e.preventDefault();
+            //     return false;
+            // }
 
             // 显示加载动画
             if (loadingOverlay) {
@@ -124,5 +138,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             return true;
         });
+    }
+
+    // 页面加载时应用保存的主题
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
     }
 });

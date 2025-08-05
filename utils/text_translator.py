@@ -10,7 +10,7 @@ DEFAULT_TIMEOUT = 5
 def init_translators():
     ts.preaccelerate_and_speedtest(timeout=float(DEFAULT_TIMEOUT))
 
-def get_text_translated(text_list: List[str], from_lang: str = 'en', to_lang: str = 'zh') -> List[str]:
+def get_text_translated(text_list: List[str], from_lang: str = 'auto', to_lang: str = 'zh') -> List[str]:
     """获取文本的翻译, 失败时尝试其他翻译器"""
     logger.info(f"正在翻译 {len(text_list)} 条文本...")
     translated_text = []

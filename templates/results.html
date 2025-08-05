@@ -14,7 +14,16 @@
         <h1><a href="https://github.com/Pi3-l22/TingJu" target="_blank">听句 TingJu</a></h1>
 
         <div class="tools-group">
-            <button class="export-btn">⚙️导出</button>
+            <div class="theme-selector-container">
+                <button class="theme-btn tool-btn">🎨主题</button>
+                <div class="theme-selector-dropdown">
+                    <div class="theme-option" id="default">默认</div>
+                    <div class="theme-option" id="dark">深紫</div>
+                    <div class="theme-option" id="pink">粉白</div>
+                    <!-- 可以添加更多主题选项 -->
+                </div>
+            </div>
+            <button class="export-btn tool-btn">⚙️导出</button>
         </div>
 
         {% for item in results %}

@@ -78,4 +78,10 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = '/manual';
         });
     }
+
+    // 页面加载时应用保存的主题
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    }
 });

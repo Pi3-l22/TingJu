@@ -12,6 +12,8 @@ textarea {
 	resize: vertical;
 	box-sizing: border-box;
 	outline-color: var(--primary-color);
+	background-color: var(--container-bg-color);
+	color: var(--text-primary-color);
 }
 
 .voice-selector {

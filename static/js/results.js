@@ -20,6 +20,46 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // 主题选择功能
+    const themeBtn = document.querySelector('.theme-btn');
+    const themeDropdown = document.querySelector('.theme-selector-dropdown');
+    const themeOptions = document.querySelectorAll('.theme-option');
+
+    // 点击主题按钮显示/隐藏下拉菜单
+    if (themeBtn && themeDropdown) {
+        themeBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            themeDropdown.classList.toggle('show');
+        });
+
+        // 点击页面其他地方隐藏下拉菜单
+        document.addEventListener('click', function (e) {
+            if (!themeBtn.contains(e.target) && themeDropdown.classList.contains('show')) {
+                themeDropdown.classList.remove('show');
+            }
+        });
+    }
+
+    // 为每个主题选项添加点击事件
+    themeOptions.forEach(option => {
+        option.addEventListener('click', function () {
+            const theme = this.getAttribute('id');
+            document.documentElement.setAttribute('data-theme', theme);
+            // 保存用户选择到localStorage
+            localStorage.setItem('theme', theme);
+            // 隐藏下拉菜单
+            if (themeDropdown) {
+                themeDropdown.classList.remove('show');
+            }
+        });
+    });
+
+    // 页面加载时应用保存的主题
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+
     // 听写模式功能
     const dictationBtn = document.querySelector('.dictation-btn');
     if (dictationBtn) {

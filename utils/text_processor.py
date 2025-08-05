@@ -65,7 +65,7 @@ def get_sentences(paragraph: str) -> list[str]:
     paragraph = normalize_text(paragraph)
     sentences = nltk.sent_tokenize(paragraph)
     # 如果句子字符数少于3个字符，则忽略
-    sentences = [s for s in sentences if len(s) > 3]
+    sentences = [s for s in sentences if len(s) > 2]
     logger.info(f"段落分割完成，共 {len(sentences)} 个句子")
     return sentences
 
@@ -73,8 +73,6 @@ def get_words(sentence: str) -> list[str]:
     """将句子分成单词"""
     sentence = normalize_text(sentence)
     words = nltk.word_tokenize(sentence)
-    # 如果单词字符数少于2个字符，则忽略
-    words = [w for w in words if len(w) > 1]
     logger.info(f"句子分割完成，共 {len(words)} 个单词")
     return words
 
