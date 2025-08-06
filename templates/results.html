@@ -29,7 +29,7 @@
                 <button class="tool-btn" id="font-btn">🗛字体</button>
                 <div class="selector-dropdown">
                     <div class="option" id="default">Default</div>
-                    <div class="option" id="Source-Sans">Source Sans</div>
+                    <!-- <div class="option" id="Source-Sans">Source Sans</div> -->
                     <div class="option" id="Source-Serif">Source Serif</div>
                     <div class="option" id="Outfit">Outfit</div>
                     <div class="option" id="Nunito">Nunito</div>
@@ -49,7 +49,8 @@
         <div class="result-item">
             <div class="sentence"><strong>{{ loop.index }}. </strong> {{ item.sentence }}</div>
             <div class="translation">{{ item.translation }}</div>
-            <input class="user-input" type="text" placeholder="播放音频，听写句子...">
+            <!-- <input class="user-input" type="text" placeholder="播放音频，听写句子..."> -->
+            <textarea class="user-input" placeholder="播放音频，听写句子..." spellcheck="true" autocomplete="off"></textarea>
             <div class=" audio-controls">
                 <audio controls class="audio-player">
                     <source src="/{{ item.audio_path }}" type="audio/mpeg">

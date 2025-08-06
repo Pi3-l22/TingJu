@@ -67,7 +67,7 @@ body {
 	color: var(--text-primary-color);
 }
 
-.user-input {
+/* .user-input {
 	display: none;
 	width: 100%;
 	font-family: var(--mono-font);
@@ -81,6 +81,25 @@ body {
 	box-sizing: border-box;
 	transition: var(--transition);
 	background-color: var(--container-bg-color);
+} */
+
+.user-input {
+	display: none;
+	width: 100%;
+	font-family: var(--mono-font);
+	font-size: 16px;
+	color: var(--text-primary-color);
+	padding: 15px;
+	margin-bottom: 20px;
+	border-radius: var(--border-radius);
+	border: 1px solid var(--border-color);
+	outline-color: var(--primary-color);
+	box-sizing: border-box;
+	background-color: var(--container-bg-color);
+	resize: vertical;
+	overflow: auto;
+	height: 55px;
+	min-height: 55px;
 }
 
 .btn-group {
