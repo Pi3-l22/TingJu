@@ -1,5 +1,6 @@
 fastapi
 uvicorn
+jinja2
 python-multipart
 edge-tts
 PyMuPDF

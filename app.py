@@ -16,6 +16,20 @@ from utils.text_translator import get_text_translated
 from utils.audio_generator import generate_audio, list_voices, AUDIO_DIR
 from utils.logger import logger
 
+import sys
+
+# 处理打包后的资源路径
+if getattr(sys, 'frozen', False):
+    # 运行在打包环境中
+    BASE_DIR = Path(getattr(sys, '_MEIPASS', Path(__file__).parent))
+else:
+    # 运行在开发环境中
+    BASE_DIR = Path(__file__).parent
+
+# 更新静态文件和模板路径
+static_path = BASE_DIR / "static"
+templates_path = BASE_DIR / "templates"
+
 # 存储临时文件路径的全局变量
 TEMP_FILE_PATH: Optional[Path] = None
 
