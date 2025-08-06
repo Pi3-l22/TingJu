@@ -3,7 +3,7 @@ name: Release
 on:
     push:
         tags:
-            - "v*.*.*" # 当推送符合 v*.*.* 格式的标签时触发
+            - "v*.*.*"
 
 jobs:
     build:
@@ -22,99 +22,83 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Set up Python
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: "3.12"
+                  cache: pip
 
             - name: Install dependencies
               run: |
                   python -m pip install --upgrade pip
-                  pip install -r requirements.txt
-                  pip install pyinstaller
+                  pip install -r requirements.txt pyinstaller
 
             - name: Build executable with PyInstaller
               run: |
-                  pyinstaller --onefile --distpath ./dist/app --workpath ./build --specpath ./spec app.py
+                  pyinstaller --name TingJu --onedir --icon "${{ github.workspace }}/static/img/icon.ico" --distpath ./dist --workpath ./build --specpath ./spec app.py
 
-            - name: Set executable permissions (Linux/macOS)
-              if: matrix.os != 'windows-latest'
-              run: |
-                  chmod +x ./dist/app/app
-
-            - name: Copy necessary directories to dist folder
+            - name: Copy extra directories
               shell: bash
               run: |
-                  # 使用bash shell在所有平台上运行相同的命令
-                  cp -r static dist/app/
-                  cp -r templates dist/app/
-                  cp -r utils dist/app/
-                  # 复制可能需要的其他文件或目录（如果存在）
-                  [ -d "temp" ] && cp -r temp dist/app/ || echo "temp directory not found"
-                  [ -d "audios" ] && cp -r audios dist/app/ || echo "audios directory not found"
-                  [ -d "exports" ] && cp -r exports dist/app/ || echo "exports directory not found"
+                  cp -r static templates dist/TingJu
 
-            - name: Create zip archive
+            - name: Make binary executable (Unix)
+              if: runner.os != 'Windows'
+              run: chmod +x dist/TingJu
+
+            - name: Create zip archive (Windows)
+              if: runner.os == 'Windows'
+              shell: pwsh
+              run: |
+                  Compress-Archive -Path dist/TingJu/* -DestinationPath TingJu-${{ github.ref_name }}-${{ matrix.asset-suffix }}.zip
+
+            - name: Create zip archive (Unix)
+              if: runner.os != 'Windows'
               shell: bash
               run: |
-                  cd dist/app
-                  zip -r "../../TingJu-${{ github.ref_name }}-${{ matrix.asset-suffix }}.zip" *
+                  cd dist/TingJu
+                  zip -r "../../TingJu-${{ github.ref_name }}-${{ matrix.asset-suffix }}.zip" .
 
             - name: Upload artifact
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
-                  name: TingJu-${{ github.ref_name }}-${{ matrix.asset-suffix }}.zip
+                  name: TingJu-${{ github.ref_name }}-${{ matrix.asset-suffix }}
                   path: TingJu-${{ github.ref_name }}-${{ matrix.asset-suffix }}.zip
+                  if-no-files-found: error
 
     release:
         needs: build
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Download all artifacts
-              uses: actions/download-artifact@v3
+              uses: actions/download-artifact@v4
+              with:
+                  path: artifacts
 
-            - name: Create Release
-              id: create_release
-              uses: actions/create-release@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Display structure of downloaded files
+              run: ls -R artifacts
+
+            - name: Generate release notes
+              run: |
+                  TEMPLATE=$(< .github/release_template.md)
+                  NOTES="${TEMPLATE//\$\{\{ VERSION \}\}/${{ github.ref_name }}}"
+                  echo "$NOTES" > RELEASE.md
+
+            - name: Create release and upload assets
+              uses: softprops/action-gh-release@v2
               with:
                   tag_name: ${{ github.ref_name }}
-                  release_name: Release ${{ github.ref_name }}
+                  name: Release ${{ github.ref_name }}
+                  body_path: RELEASE.md
                   draft: false
                   prerelease: false
-
-            - name: Upload Windows Release Asset
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ./TingJu-${{ github.ref_name }}-windows.zip/TingJu-${{ github.ref_name }}-windows.zip
-                  asset_name: TingJu-${{ github.ref_name }}-windows.zip
-                  asset_content_type: application/zip
-
-            - name: Upload Linux Release Asset
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ./TingJu-${{ github.ref_name }}-linux.zip/TingJu-${{ github.ref_name }}-linux.zip
-                  asset_name: TingJu-${{ github.ref_name }}-linux.zip
-                  asset_content_type: application/zip
-
-            - name: Upload macOS Release Asset
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ./TingJu-${{ github.ref_name }}-macos.zip/TingJu-${{ github.ref_name }}-macos.zip
-                  asset_name: TingJu-${{ github.ref_name }}-macos.zip
-                  asset_content_type: application/zip
+                  files: |
+                      artifacts/*/*.zip

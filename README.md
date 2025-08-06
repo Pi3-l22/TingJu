@@ -1,13 +1,9 @@
-<style>
-@import url("https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Pacifico&display=swap");
-h1 {
-    font-size: 50px;
-    font-family: "Pacifico", "Ma Shan Zheng";
-}
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Pacifico&display=swap" rel="stylesheet">
 
 <div align="center">
-  <h1 align="center">
+  <h1 align="center" style="font-size: 50px; font-family: 'Pacifico', 'Ma Shan Zheng';">
     听句 TingJu
   </h1>
   
@@ -85,9 +81,10 @@ h1 {
 
 ### 快速开始（推荐）
 
-Windows用户可以直接在 [Release](https://github.com/Pi3-l22/TingJu/releases/latest) 下载打包后的exe文件启动程序。
-
-双击exe文件即可启动程序。
+1. 从 [Release](https://github.com/Pi3-l22/releases/latest) 页面下载最新版压缩包
+2. 解压并双击运行 TingJu 可执行文件
+3. TingJu 会在 2 秒后自动打开默认浏览器，即可开始使用
+4. 若未自动打开浏览器，请手动打开浏览器访问 `http://127.0.0.1:51122`
 
 ### 从源码启动
 
@@ -112,13 +109,31 @@ python app.py
 ### 使用方法
 
 1. **上传文档**：点击"选择文件"按钮上传支持格式的文档，或点击"手动填写"直接输入文本
+
+![index](./static/img/screenshot_index.png)
+
 2. **确认文本**：检查并确认提取的文本内容
 3. **选择音色**：从可用的英语发音人声中选择喜欢的音色
+
+![text](./static/img/screenshot_text.png)
+
 4. **生成内容**：点击"确认生成"，系统将自动处理文本、生成翻译和音频
-5. **开始学习**：
-   - 点击播放按钮听取标准发音
-   - 使用听写模式练习英语听力
-   - 使用听读模式跟读练习口语
+5. **听读模式**：点击播放按钮听取标准发音，可根据情况调整播放速度
+
+![results](./static/img/screenshot_results.png)
+
+6. **听写模式**：使用听写模式练习英语听力，鼠标悬浮有提示
+
+![dictation](./static/img/screenshot_dictation.png)
+
+
+7. **导出内容**：通过右上角导出按钮，将生成的内容导出为离线版本，随时随地手机电脑听读听写
+
+![export](./static/img/screenshot_export.png)
+
+8. **主题样式**：通过主题和字体按钮，更换喜欢的颜色和字体样式，换个主题，换个心情
+
+![theme](./static/img/screenshot_theme.png)
 
 ## 📁 项目结构
 
@@ -144,7 +159,7 @@ TingJu/
 
 ## 🧩 技术架构
 
-- 前端使用原生HTML + CSS + JavaScript（无前端框架）
+- 前端使用原生HTML + CSS + JavaScript
 - 后端使用Python + FastAPI + Uvicorn
 
 ## 🤝 贡献
@@ -174,11 +189,5 @@ TingJu/
 
 ## 📧 联系方式
 
-项目链接: [https://github.com/Pi3-l22/TingJu](https://github.com/Pi3-l22/TingJu)
-个人博客: [https://blog.pi3.fun](https://blog.pi3.fun)
-
----
-
-<p align="center">
-  🎉 让我们一起提升英语听说能力，开启语言学习的新篇章！
-</p>
+项目链接：[https://github.com/Pi3-l22/TingJu](https://github.com/Pi3-l22/TingJu)
+个人博客：[https://blog.pi3.fun](https://blog.pi3.fun)

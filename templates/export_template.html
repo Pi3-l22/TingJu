@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>听句 TingJu - 英语听说学习工具</title>
-    <link rel="icon" type="image/png" href="./img/favicon.png">
-    <link rel="stylesheet" href="./css/results.css">
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
+    <link rel="stylesheet" href="/static/css/results.css">
 </head>
 
 <body>
@@ -14,25 +14,46 @@
         <h1><a href="https://github.com/Pi3-l22/TingJu" target="_blank">听句 TingJu</a></h1>
 
         <div class="tools-group">
-            <div class="theme-selector-container">
-                <button class="theme-btn tool-btn">🎨主题</button>
-                <div class="theme-selector-dropdown">
-                    <div class="theme-option" id="default">默认</div>
-                    <div class="theme-option" id="dark">深紫</div>
-                    <div class="theme-option" id="pink">粉白</div>
-                    <!-- 可以添加更多主题选项 -->
+            <div class="selector-container">
+                <button class="tool-btn" id="theme-btn">🎨主题</button>
+                <div class="selector-dropdown">
+                    <div class="option" id="default">晴空</div>
+                    <div class="option" id="blue">云海</div>
+                    <div class="option" id="green">春野</div>
+                    <div class="option" id="pink">桃夭</div>
+                    <div class="option" id="dark">暮灰</div>
+                    <div class="option" id="dark-purple">紫霭</div>
                 </div>
             </div>
+            <div class="selector-container">
+                <button class="tool-btn" id="font-btn">🗛字体</button>
+                <div class="selector-dropdown">
+                    <div class="option" id="default">Default</div>
+                    <!-- <div class="option" id="Source-Sans">Source Sans</div> -->
+                    <div class="option" id="Source-Serif">Source Serif</div>
+                    <div class="option" id="Outfit">Outfit</div>
+                    <div class="option" id="Nunito">Nunito</div>
+                    <div class="option" id="Bree-Serif">Bree-Serif</div>
+                </div>
+            </div>
+            <button class="tool-btn" id="export-btn">⚙️导出</button>
+        </div>
+
+        <div id="status-info">
+            {% if warning %}
+            <span class="warning">⚠ {{ warning }}</span>
+            {% endif %}
         </div>
 
         {% for item in results %}
         <div class="result-item">
             <div class="sentence"><strong>{{ loop.index }}. </strong> {{ item.sentence }}</div>
             <div class="translation">{{ item.translation }}</div>
-            <input class="user-input" type="text" placeholder="播放音频，听写句子...">
+            <!-- <input class="user-input" type="text" placeholder="播放音频，听写句子..."> -->
+            <textarea class="user-input" placeholder="播放音频，听写句子..." spellcheck="true" autocomplete="off"></textarea>
             <div class=" audio-controls">
                 <audio controls class="audio-player">
-                    <source src="./{{ item.audio_path }}" type="audio/mpeg">
+                    <source src="/{{ item.audio_path }}" type="audio/mpeg">
                     <span class="warning">您的浏览器不支持音频播放，换一个浏览器试试</span>
                 </audio>
             </div>
@@ -46,7 +67,7 @@
         </div>
     </div>
 
-    <script src="./js/results.js"></script>
+    <script src="/static/js/results.js"></script>
 </body>
 
 </html>

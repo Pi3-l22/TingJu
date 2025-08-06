@@ -33,7 +33,7 @@ textarea {
 	border: 2px solid var(--border-color);
 	border-radius: var(--border-radius);
 	font-size: 16px;
-	font-family: var(--mono-font);
+	font-family: var(--text-font);
 	background-color: var(--container-bg-color);
 	color: var(--text-primary-color);
 	outline-color: var(--primary-color);
