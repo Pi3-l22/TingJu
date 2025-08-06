@@ -145,4 +145,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (savedTheme) {
         document.documentElement.setAttribute('data-theme', savedTheme);
     }
+
+    // 页面加载时应用保存的字体主题
+    const savedFontTheme = localStorage.getItem('font-theme');
+    if (savedFontTheme) {
+        document.documentElement.setAttribute('font-theme', savedFontTheme);
+    }
 });

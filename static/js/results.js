@@ -21,9 +21,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 主题选择功能
-    const themeBtn = document.querySelector('.theme-btn');
-    const themeDropdown = document.querySelector('.theme-selector-dropdown');
-    const themeOptions = document.querySelectorAll('.theme-option');
+    const themeBtn = document.getElementById('theme-btn');
+    const themeDropdown = themeBtn.nextElementSibling
+    const themeOptions = themeDropdown.querySelectorAll('.option');
 
     // 点击主题按钮显示/隐藏下拉菜单
     if (themeBtn && themeDropdown) {
@@ -59,6 +59,47 @@ document.addEventListener('DOMContentLoaded', function () {
     if (savedTheme) {
         document.documentElement.setAttribute('data-theme', savedTheme);
     }
+
+    // 字体选择功能
+    const fontBtn = document.getElementById('font-btn');
+    const fontDropdown = fontBtn.nextElementSibling;
+    const fontOptions = fontDropdown.querySelectorAll('.option');
+
+    // 点击字体按钮显示/隐藏下拉菜单
+    if (fontBtn && fontDropdown) {
+        fontBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            fontDropdown.classList.toggle('show');
+        });
+
+        // 点击页面其他地方隐藏下拉菜单
+        document.addEventListener('click', function (e) {
+            if (!fontBtn.contains(e.target) && fontDropdown.classList.contains('show')) {
+                fontDropdown.classList.remove('show');
+            }
+        });
+    }
+
+    // 为每个主题选项添加点击事件
+    fontOptions.forEach(option => {
+        option.addEventListener('click', function () {
+            const theme = this.getAttribute('id');
+            document.documentElement.setAttribute('font-theme', theme);
+            // 保存用户选择到localStorage
+            localStorage.setItem('font-theme', theme);
+            // 隐藏下拉菜单
+            if (themeDropdown) {
+                themeDropdown.classList.remove('show');
+            }
+        });
+    });
+
+    // 页面加载时应用保存的字体主题
+    const savedFontTheme = localStorage.getItem('font-theme');
+    if (savedFontTheme) {
+        document.documentElement.setAttribute('font-theme', savedFontTheme);
+    }
+
 
     // 听写模式功能
     const dictationBtn = document.querySelector('.dictation-btn');
@@ -198,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 导出功能
-    const exportBtn = document.querySelector('.export-btn');
+    const exportBtn = document.getElementById('export-btn');
     if (exportBtn) {
         exportBtn.addEventListener('click', async function () {
             const infoDiv = document.getElementById('status-info');
@@ -217,6 +258,11 @@ document.addEventListener('DOMContentLoaded', function () {
             } catch (error) {
                 infoDiv.innerHTML = '<span class="error">‼ 导出过程出错: ' + error.message + '</span>';
             }
+
+            // 10秒后自动清除提示信息
+            setTimeout(() => {
+                infoDiv.innerHTML = '';
+            }, 10000); // 10000毫秒 = 10秒
         });
     }
 });

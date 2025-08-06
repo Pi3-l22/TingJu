@@ -1,7 +1,7 @@
 @import url("./theme.css");
 
 body {
-	font-family: var(--text-sans-font);
+	font-family: var(--text-font);
 	max-width: 800px;
 	margin: 0 auto;
 	padding: 20px;
@@ -46,6 +46,7 @@ a {
 	border-radius: var(--border-radius);
 	cursor: pointer;
 	font-size: 16px;
+	font-family: var(--text-font);
 	transition: var(--transition);
 }
 

@@ -10,7 +10,7 @@
 	--primary-bg-color: #e0eafc;
 	--primary-hover-color: #3266b9;
 	--secondary-color: #6c757d;
-	--secondary-hover-color: #545b62;
+	--secondary-hover-color: #5c636a;
 
 	/* 背景颜色 */
 	--body-bg-color: #f5f5f5;
@@ -24,15 +24,15 @@
 
 	/* 边框和阴影 */
 	--border-color: #dddddd;
-	--box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+	--box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 
 	/* 状态颜色 */
 	--success-color: #34a853;
-	--success-bg-color: #e3f9e9;
+	--success-bg-color: rgba(52, 168, 83, 0.1);
 	--error-color: #ea4335;
-	--error-bg-color: #fde8e5;
+	--error-bg-color: rgba(234, 67, 53, 0.1);
 	--warning-color: #ffa502;
-	--warning-bg-color: #fff3e0;
+	--warning-bg-color: rgba(255, 165, 2, 0.1);
 
 	/* 圆角大小 */
 	--border-radius: 10px;
@@ -41,49 +41,78 @@
 	--transition: all 0.3s ease-in-out;
 
 	/* 字体样式 */
-	--serif-font: "Source Serif 4", "Bree Serif", "Times New Roman", Times, serif;
-	--sans-font: "Source Sans 3", "Outfit", "Nunito", Arial, sans-serif;
+	--title-font: "Pacifico", "Ma Shan Zheng", var(--text-font);
 	--mono-font: "Google Sans Code", "SF Mono", "Consolas", Menlo, "Noto Sans SC", monospace;
-	--title-font: "Pacifico", "Ma Shan Zheng", var(--sans-font);
-	--text-sans-font: "Noto Sans SC", sans-serif;
-	--text-serif-font: "Noto Serif SC", serif;
+	--text-font: "Noto Sans SC", sans-serif;
+	--sentence-font: var(--text-font);
 }
 
-[data-theme="dark"] {
+[data-theme="blue"] {
 	/* 主要颜色 .*/
-	--primary-color: #cba6f7;
-	--primary-bg-color: rgba(203, 166, 247, 0.3);
-	--primary-hover-color: #9177b1;
-	--secondary-color: #969a9e;
-	--secondary-hover-color: #565d64;
+	--primary-color: #3f72af;
+	--primary-bg-color: rgba(63, 114, 175, 0.3);
+	--primary-hover-color: rgb(134, 153, 196);
+	--secondary-color: #a2a5a6;
+	--secondary-hover-color: #888a8b;
 
 	/* 背景颜色 */
-	--body-bg-color: #11111b;
-	--container-bg-color: #2a2b3c;
-	--item-bg-color: #181825;
+	--body-bg-color: #dbe2ef;
+	--container-bg-color: #f9f7f7;
+	--item-bg-color: #eeeeee;
 
 	/* 文字颜色 */
-	--text-primary-color: #cdd6f4;
-	--text-secondary-color: #8f99b2;
-	--text-light-color: #11111b;
+	--text-primary-color: #112d4e;
+	--text-secondary-color: #415e72;
+	--text-light-color: #ffffff;
 
 	/* 边框和阴影 */
-	--border-color: #64676d;
-	--box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+	--border-color: #dddddd;
+	--box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 
 	/* 状态颜色 */
-	--success-color: #caffbf;
-	--success-bg-color: rgba(202, 255, 191, 0.1);
-	--error-color: #ffadad;
-	--error-bg-color: rgba(255, 173, 173, 0.1);
-	--warning-color: #fdffb6;
-	--warning-bg-color: rgba(253, 255, 182, 0.1);
+	--success-color: #34a853;
+	--success-bg-color: rgba(52, 168, 83, 0.1);
+	--error-color: #ea4335;
+	--error-bg-color: rgba(234, 67, 53, 0.1);
+	--warning-color: #ffa502;
+	--warning-bg-color: rgba(255, 165, 2, 0.1);
+}
+
+[data-theme="green"] {
+	/* 主要颜色 .*/
+	--primary-color: #609966;
+	--primary-bg-color: rgba(96, 153, 102, 0.3);
+	--primary-hover-color: #528457;
+	--secondary-color: #778088;
+	--secondary-hover-color: #636b72;
+
+	/* 背景颜色 */
+	--body-bg-color: #9dc08b;
+	--container-bg-color: #edf1d6;
+	--item-bg-color: #dee8ce;
+
+	/* 文字颜色 */
+	--text-primary-color: #40513b;
+	--text-secondary-color: #394857;
+	--text-light-color: #ffffff;
+
+	/* 边框和阴影 */
+	--border-color: #c5cdb0;
+	--box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+
+	/* 状态颜色 */
+	--success-color: #34a853;
+	--success-bg-color: rgba(52, 168, 83, 0.1);
+	--error-color: #ea4335;
+	--error-bg-color: rgba(234, 67, 53, 0.1);
+	--warning-color: #ffa502;
+	--warning-bg-color: rgba(255, 165, 2, 0.1);
 }
 
 [data-theme="pink"] {
 	/* 主要颜色 .*/
 	--primary-color: #f6b2ce;
-	--primary-bg-color: rgba(239, 196, 214, 0.5);
+	--primary-bg-color: rgba(239, 196, 214, 0.3);
 	--primary-hover-color: #d3aebd;
 	--secondary-color: #b2b6b8;
 	--secondary-hover-color: #919395;
@@ -100,44 +129,101 @@
 
 	/* 边框和阴影 */
 	--border-color: #dddddd;
-	--box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+	--box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 
 	/* 状态颜色 */
 	--success-color: #34a853;
-	--success-bg-color: #e3f9e9;
+	--success-bg-color: rgba(52, 168, 83, 0.1);
 	--error-color: #ea4335;
-	--error-bg-color: #fde8e5;
+	--error-bg-color: rgba(234, 67, 53, 0.1);
 	--warning-color: #ffa502;
-	--warning-bg-color: #fff3e0;
+	--warning-bg-color: rgba(255, 165, 2, 0.1);
 }
 
-[data-theme="blue"] {
+[data-theme="dark"] {
 	/* 主要颜色 .*/
-	--primary-color: #abc4ff;
-	--primary-bg-color: rgba(171, 196, 255, 0.5);
-	--primary-hover-color: #96aada;
-	--secondary-color: #b2b6b8;
-	--secondary-hover-color: #919395;
+	--primary-color: #ced6e0;
+	--primary-bg-color: rgba(206, 214, 224, 0.3);
+	--primary-hover-color: #b6bec8;
+	--secondary-color: #a4b0be;
+	--secondary-hover-color: #909ba7;
 
 	/* 背景颜色 */
-	--body-bg-color: #d7e3fc;
-	--container-bg-color: #edf2fa;
-	--item-bg-color: #eeeeee;
+	--body-bg-color: #2f3542;
+	--container-bg-color: #57606f;
+	--item-bg-color: #6c7689;
 
 	/* 文字颜色 */
-	--text-primary-color: #272343;
-	--text-secondary-color: #4e535f;
-	--text-light-color: #11111b;
+	--text-primary-color: #f1f2f6;
+	--text-secondary-color: #dfe4ea;
+	--text-light-color: #2f3542;
 
 	/* 边框和阴影 */
-	--border-color: #dddddd;
-	--box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+	--border-color: #a4b0be;
+	--box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 
 	/* 状态颜色 */
-	--success-color: #34a853;
-	--success-bg-color: #e3f9e9;
-	--error-color: #ea4335;
-	--error-bg-color: #fde8e5;
-	--warning-color: #ffa502;
-	--warning-bg-color: #fff3e0;
+	--success-color: #7bed9f;
+	--success-bg-color: rgba(123, 237, 159, 0.1);
+	--error-color: #ff6b81;
+	--error-bg-color: rgba(255, 107, 129, 0.1);
+	--warning-color: #eccc68;
+	--warning-bg-color: rgba(236, 204, 104, 0.1);
+}
+
+[data-theme="dark-purple"] {
+	/* 主要颜色 .*/
+	--primary-color: #8a96e5;
+	--primary-bg-color: rgba(138, 150, 229, 0.3);
+	--primary-hover-color: #7a88e2;
+	--secondary-color: #969a9e;
+	--secondary-hover-color: #a5a9ae;
+
+	/* 背景颜色 */
+	--body-bg-color: #2c2e3a;
+	--container-bg-color: #383a47;
+	--item-bg-color: #2c2e3a;
+
+	/* 文字颜色 */
+	--text-primary-color: #cdd6f4;
+	--text-secondary-color: #a2a4ba;
+	--text-light-color: #ffffff;
+
+	/* 边框和阴影 */
+	--border-color: #4e515f;
+	--box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+
+	/* 状态颜色 */
+	--success-color: #caffbf;
+	--success-bg-color: rgba(202, 255, 191, 0.1);
+	--error-color: #ffadad;
+	--error-bg-color: rgba(255, 173, 173, 0.1);
+	--warning-color: #fdffb6;
+	--warning-bg-color: rgba(253, 255, 182, 0.1);
+}
+
+/* 字体主题 */
+[font-theme="Source-Sans"] {
+	--text-font: "Noto Sans SC", sans-serif;
+	--sentence-font: "Source Sans 3", Arial, sans-serif;
+}
+
+[font-theme="Outfit"] {
+	--text-font: "Noto Sans SC", sans-serif;
+	--sentence-font: "Outfit", Arial, sans-serif;
+}
+
+[font-theme="Nunito"] {
+	--text-font: "Noto Sans SC", sans-serif;
+	--sentence-font: "Nunito", Arial, sans-serif;
+}
+
+[font-theme="Source-Serif"] {
+	--text-font: "Noto Serif SC", serif;
+	--sentence-font: "Source Serif 4", "Times New Roman", Times, serif;
+}
+
+[font-theme="Bree-Serif"] {
+	--text-font: "Noto Serif SC", serif;
+	--sentence-font: "Bree Serif", "Times New Roman", Times, serif;
 }

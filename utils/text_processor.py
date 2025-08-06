@@ -54,7 +54,7 @@ def init_nltk():
             nltk.download('punkt_tab', download_dir=DATA_DIR)
             logger.info("punkt 和 punkt_tab 下载完成")
         except Exception as e:
-            logger.error(f"punkt 或 punkt_tab 下载失败: {e}")
+            logger.error(f"punkt 或 punkt_tab 下载失败，可能与网络情况有关: {e}")
             raise e
     finally:
         logger.info("nltk 库初始化完成")
