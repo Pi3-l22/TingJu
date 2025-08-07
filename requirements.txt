@@ -1,8 +1,8 @@
-fastapi
-uvicorn
-jinja2
-python-multipart
-edge-tts
-PyMuPDF
-nltk
-translators
+fastapi>=0.68.0,<1.0.0
+uvicorn>=0.35.0,<1.0.0
+jinja2>=3.0.0,<4.0.0
+python-multipart>=0.0.20,<1.0.0
+edge-tts>=7.0.0,<8.0.0
+PyMuPDF>=1.26.0,<2.0.0
+nltk>=3.9.0,<4.0.0
+translators>=6.0.0,<7.0.0

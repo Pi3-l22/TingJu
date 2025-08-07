@@ -1,12 +1,6 @@
-<head>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Pacifico&display=swap" rel="stylesheet">
-</head>
-
 <div align="center">
-  <h1 align="center" style="font-size: 50px; font-family: 'Pacifico', 'Ma Shan Zheng';">
-    听句 TingJu
+  <h1 align="center">
+    <img src="./static/img/title.png" width=50%>
   </h1>
   
   <p align="center">
@@ -14,10 +8,11 @@
   </p>
   
   <p align="center">
-    <img src="https://img.shields.io/badge/Python-3.8+-blue?logo=python" alt="Python">
-    <img src="https://img.shields.io/badge/FastAPI-0.68.0+-green?logo=fastapi" alt="FastAPI">
-    <img src="https://img.shields.io/badge/license-AGPL-blue" alt="License">
-    <img src="https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey" alt="Platform">
+    <img src="https://img.shields.io/badge/Python-3.8+-3f72af?style=flat-square&logo=python" alt="Python">
+    <img src="https://img.shields.io/badge/FastAPI-0.68.0+-609966?style=flat-square&logo=fastapi" alt="FastAPI">
+    <img src="https://img.shields.io/github/languages/code-size/Pi3-l22/TingJu?style=flat-square&logo=GitHub&color=ced6e0" alt="FastAPI">
+    <img src="https://img.shields.io/github/license/Pi3-l22/TingJu?style=flat-square&color=f6b2ce" alt="License">
+    <img src="https://img.shields.io/badge/platform-Windows%20%7C%20MacOS%20%7C%20Linux%20%7C%20Mobile-8a96e5?style=flat-square" alt="Platform">
   </p>
 
   <a href="https://github.com/Pi3-l22/TingJu" target="_blank">
@@ -112,34 +107,37 @@ python app.py
 
 1. **上传文档**：点击"选择文件"按钮或拖拽上传支持格式的英文文档，也可以点击"手动填写"直接输入英文文本
 
-![index](./static/img/screenshot_index.png)
+![index](./static/img/screenshot/screenshot_index.png)
 
 2. **确认文本**：检查并确认提取的文本内容
 3. **选择音色**：从可用的英语发音人声中选择喜欢的音色
 
-![text](./static/img/screenshot_text.png)
+![text](./static/img/screenshot/screenshot_text.png)
 
 4. **生成内容**：点击"确认生成"，系统将自动处理文本、生成翻译和音频
 5. **听读模式**：点击播放按钮听取标准发音，可根据情况调整播放速度
 
-![results](./static/img/screenshot_results.png)
+![results](./static/img/screenshot/screenshot_results.png)
 
 6. **听写模式**：使用听写模式练习英语听力，鼠标悬浮有提示
 
-![dictation](./static/img/screenshot_dictation.png)
+![dictation](./static/img/screenshot/screenshot_dictation.png)
 
 7. **主题样式**：通过主题和字体按钮，更换喜欢的颜色和字体样式，换个主题，换个心情
 
-![theme](./static/img/screenshot_theme.png)
+![theme](./static/img/screenshot/screenshot_theme.png)
 
 8. **导出内容**：通过右上角导出按钮，将生成的内容导出为离线版本，随时随地手机电脑听读听写
 
-![export](./static/img/screenshot_export.png)
+![export](./static/img/screenshot/screenshot_export.png)
 
 > [!IMPORTANT]
 > 由于手机平板等移动设备的安全限制，导出的HTML文件可能无法加载CSS样式、JS脚本功能以及音频文件。
 >
 > 因此需要您在移动设备上启动一个HTTP服务器，才能正常浏览和播放内容。
+
+> [!NOTE]
+> 更详细的使用教程，包括移动端的使用方法，👉可访问 [文字教程](https://blog.pi3.fun/post/tingju/tingju-usage/) 或 [视频教程](https://www.bilibili.com/video)]
 
 ## 📁 项目结构
 
@@ -195,5 +193,7 @@ TingJu/
 
 ## 📧 联系方式
 
-- 项目链接：[https://github.com/Pi3-l22/TingJu](https://github.com/Pi3-l22/TingJu)
+- 项目仓库：[https://github.com/Pi3-l22/TingJu](https://github.com/Pi3-l22/TingJu)
 - 个人博客：[https://blog.pi3.fun](https://blog.pi3.fun)
+- 小红书：[@Pi3（学习编程版）](https://www.xiaohongshu.com/user/profile/64fdd3980000000006031895)
+- 抖音：[@Pi3（学习编程版）](https://www.douyin.com/user/MS4wLjABAAAAvz6_9reqyBtSKl7yqFA_p9HdjYUXEShF9stFjlK8gtKWq52yo6xdWnHD_uI7EmYd)
