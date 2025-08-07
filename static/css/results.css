@@ -226,14 +226,14 @@ body {
 	font-family: "Noto Sans SC", sans-serif;
 }
 
-#font-btn + .selector-dropdown .option#Source-Sans {
-	font-weight: bold;
-	font-family: "Source Sans 3", Arial, sans-serif;
-}
-
 #font-btn + .selector-dropdown .option#Source-Serif {
 	font-weight: bold;
-	font-family: "Source Serif 4", "Times New Roman", Times, serif;
+	font-family: "Noto Serif SC", "Times New Roman", Times, serif;
+}
+
+#font-btn + .selector-dropdown .option#Arvo {
+	font-weight: bold;
+	font-family: "Arvo", "Times New Roman", Times, serif;
 }
 
 #font-btn + .selector-dropdown .option#Outfit {
@@ -253,14 +253,14 @@ body {
 
 @media (max-width: 768px) {
 	.sentence {
-		font-size: 16px;
+		font-size: 18px;
 	}
 
 	.result-item {
 		padding: 10px;
 		margin-bottom: 20px;
 		background-color: var(--container-bg-color);
-		box-shadow: var(--box-shadow);
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 	}
 
 	.sentence {

@@ -1,7 +1,7 @@
 /* 引入 Google 字体 */
-@import url("https://fonts.googleapis.com/css2?family=Bree+Serif&family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@100..900&family=Noto+Serif+SC:wght@200..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Outfit:wght@100..900&family=Pacifico&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Bree+Serif&family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@100..900&family=Noto+Serif+SC:wght@200..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Outfit:wght@100..900&family=Pacifico&display=swap");
 /* Ma Shan Zheng, Pacifico */
-/* Bree Serif, Source Serif 4, Source Sans 3, Outfit, Nunito, Google Sans Code, Noto Sans SC, Noto Serif SC */
+/* Bree Serif, Arvo, Outfit, Nunito, Google Sans Code, Noto Sans SC, Noto Serif SC */
 
 /* 统一主题颜色配置 */
 :root {
@@ -44,7 +44,7 @@
 	--title-font: "Pacifico", "Ma Shan Zheng", var(--text-font);
 	--mono-font: "Google Sans Code", "SF Mono", "Consolas", Menlo, "Noto Sans SC", monospace;
 	--text-font: "Noto Sans SC", sans-serif;
-	--sentence-font: var(--text-font);
+	--sentence-font: "Noto Sans SC", Arial, sans-serif;
 }
 
 [data-theme="blue"] {
@@ -203,11 +203,6 @@
 }
 
 /* 字体主题 */
-[font-theme="Source-Sans"] {
-	--text-font: "Noto Sans SC", sans-serif;
-	--sentence-font: "Source Sans 3", Arial, sans-serif;
-}
-
 [font-theme="Outfit"] {
 	--text-font: "Noto Sans SC", sans-serif;
 	--sentence-font: "Outfit", Arial, sans-serif;
@@ -220,10 +215,15 @@
 
 [font-theme="Source-Serif"] {
 	--text-font: "Noto Serif SC", serif;
-	--sentence-font: "Source Serif 4", "Times New Roman", Times, serif;
+	--sentence-font: "Noto Serif SC", "Times New Roman", Times, serif;
+}
+
+[font-theme="Arvo"] {
+	--text-font: "Noto Sans SC", sans-serif;
+	--sentence-font: "Arvo", "Times New Roman", Times, serif;
 }
 
 [font-theme="Bree-Serif"] {
-	--text-font: "Noto Serif SC", serif;
+	--text-font: "Noto Sans SC", sans-serif;
 	--sentence-font: "Bree Serif", "Times New Roman", Times, serif;
 }

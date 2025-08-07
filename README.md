@@ -1,6 +1,8 @@
+<head>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Pacifico&display=swap" rel="stylesheet">
+</head>
 
 <div align="center">
   <h1 align="center" style="font-size: 50px; font-family: 'Pacifico', 'Ma Shan Zheng';">
@@ -69,7 +71,7 @@
 
 ### 🖌️ 个性化界面
 - 多种主题配色方案（晴空、云海、春野、桃夭、暮灰、紫霭）
-- 多种字体选择（Source Sans、Source Serif、Outfit、Nunito、Bree-Serif）
+- 多种字体选择（Source Sans、Source Serif、Arvo、Outfit、Nunito、Bree-Serif）
 - 响应式设计，适配不同设备屏幕
 
 ### 📤 离线学习支持
@@ -81,7 +83,7 @@
 
 ### 快速开始（推荐）
 
-1. 从 [Release](https://github.com/Pi3-l22/releases/latest) 页面下载最新版压缩包
+1. 从 [Release](https://github.com/Pi3-l22/TingJu/releases/latest) 页面下载最新版压缩包
 2. 解压并双击运行 TingJu 可执行文件
 3. TingJu 会在 2 秒后自动打开默认浏览器，即可开始使用
 4. 若未自动打开浏览器，请手动打开浏览器访问 `http://127.0.0.1:51122`
@@ -108,7 +110,7 @@ python app.py
 
 ### 使用方法
 
-1. **上传文档**：点击"选择文件"按钮上传支持格式的文档，或点击"手动填写"直接输入文本
+1. **上传文档**：点击"选择文件"按钮或拖拽上传支持格式的英文文档，也可以点击"手动填写"直接输入英文文本
 
 ![index](./static/img/screenshot_index.png)
 
@@ -126,14 +128,18 @@ python app.py
 
 ![dictation](./static/img/screenshot_dictation.png)
 
+7. **主题样式**：通过主题和字体按钮，更换喜欢的颜色和字体样式，换个主题，换个心情
 
-7. **导出内容**：通过右上角导出按钮，将生成的内容导出为离线版本，随时随地手机电脑听读听写
+![theme](./static/img/screenshot_theme.png)
+
+8. **导出内容**：通过右上角导出按钮，将生成的内容导出为离线版本，随时随地手机电脑听读听写
 
 ![export](./static/img/screenshot_export.png)
 
-8. **主题样式**：通过主题和字体按钮，更换喜欢的颜色和字体样式，换个主题，换个心情
-
-![theme](./static/img/screenshot_theme.png)
+> [!IMPORTANT]
+> 由于手机平板等移动设备的安全限制，导出的HTML文件可能无法加载CSS样式、JS脚本功能以及音频文件。
+>
+> 因此需要您在移动设备上启动一个HTTP服务器，才能正常浏览和播放内容。
 
 ## 📁 项目结构
 
@@ -159,8 +165,8 @@ TingJu/
 
 ## 🧩 技术架构
 
-- 前端使用原生HTML + CSS + JavaScript
-- 后端使用Python + FastAPI + Uvicorn
+- 前端使用原生 HTML + CSS + JavaScript
+- 后端使用 Python + FastAPI + Uvicorn
 
 ## 🤝 贡献
 
@@ -189,5 +195,5 @@ TingJu/
 
 ## 📧 联系方式
 
-项目链接：[https://github.com/Pi3-l22/TingJu](https://github.com/Pi3-l22/TingJu)
-个人博客：[https://blog.pi3.fun](https://blog.pi3.fun)
+- 项目链接：[https://github.com/Pi3-l22/TingJu](https://github.com/Pi3-l22/TingJu)
+- 个人博客：[https://blog.pi3.fun](https://blog.pi3.fun)
