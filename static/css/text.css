@@ -102,3 +102,21 @@ textarea {
 		transform: rotate(360deg);
 	}
 }
+
+@media (max-width: 768px) {
+	.loading-overlay {
+		padding: 0 20px;
+		text-align: center;
+	}
+
+	.loading-overlay p {
+		font-size: 16px;
+		padding: 0 10px;
+	}
+
+	.loading-spinner {
+		width: 60px;
+		height: 60px;
+		border-width: 6px;
+	}
+}
