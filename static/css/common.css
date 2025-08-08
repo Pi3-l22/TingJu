@@ -173,6 +173,10 @@ textarea::-webkit-scrollbar-thumb:hover {
 		padding: 6px;
 	}
 
+	.description ul {
+		padding-left: 25px;
+	}
+
 	.container {
 		padding: 6px;
 		background-color: var(--body-bg-color);

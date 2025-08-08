@@ -183,6 +183,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 input.style.backgroundColor = '';
                 input.style.borderColor = '';
                 input.style.outlineColor = 'var(--primary-color)';
+                input.style.height = '55px';
 
                 // 添加模糊效果
                 sentenceElement.classList.add('blurry');
