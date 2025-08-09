@@ -1,4 +1,4 @@
-## 下载
+## 文件下载
 
 | 平台    | 文件名                                                                                                                                    |
 | ------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
@@ -6,7 +6,9 @@
 | Linux   | [TingJu-${{ VERSION }}-linux.zip](https://github.com/Pi3-l22/TingJu/releases/download/${{ VERSION }}/TingJu-${{ VERSION }}-linux.zip)     |
 | macOS   | [TingJu-${{ VERSION }}-macos.zip](https://github.com/Pi3-l22/TingJu/releases/download/${{ VERSION }}/TingJu-${{ VERSION }}-macos.zip)     |
 
-## 问题
+👉 国内下载地址: [蓝奏云 - TingJu-v1](https://pi3.lanzouo.com/b0kob9yze) | 密码:51122
+
+## 常见问题
 
 如果启动工具时出现以下错误
 
