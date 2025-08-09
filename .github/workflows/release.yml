@@ -77,7 +77,7 @@ jobs:
               shell: bash
               run: |
                   cd dist/TingJu
-                  zip -r "../../TingJu-${{ github.ref_name }}-${{ matrix.asset-suffix }}.zip" .
+                  zip -r -9 "../../TingJu-${{ github.ref_name }}-${{ matrix.asset-suffix }}.zip" .
 
             - name: Upload artifact
               uses: actions/upload-artifact@v4
