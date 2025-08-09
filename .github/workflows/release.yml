@@ -35,6 +35,24 @@ jobs:
                   python -m pip install --upgrade pip
                   pip install -r requirements.txt pyinstaller
 
+            - name: Install UPX (Windows)
+              if: runner.os == 'Windows'
+              shell: pwsh
+              run: |
+                  choco install upx -y
+                  echo "UPX_PATH=C:\ProgramData\chocolatey\bin" >> $env:GITHUB_ENV
+
+            # - name: Install UPX (Linux) (not used)
+            #   if: runner.os == 'Linux'
+            #   run: |
+            #       sudo apt-get update
+            #       sudo apt-get install -y upx
+
+            # - name: Install UPX (macOS) (not used)
+            #   if: runner.os == 'macOS'
+            #   run: |
+            #       brew install upx
+
             - name: Build executable with PyInstaller
               run: |
                   pyinstaller --name TingJu --onedir --icon "${{ github.workspace }}/static/img/icon.ico" --distpath ./dist --workpath ./build --specpath ./spec app.py
