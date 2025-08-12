@@ -57,10 +57,12 @@ jobs:
               run: |
                   pyinstaller --name TingJu --onedir --icon "${{ github.workspace }}/static/img/icon.ico" --distpath ./dist --workpath ./build --specpath ./spec app.py
 
-            - name: Copy extra directories
+            - name: Copy extra directories and files
               shell: bash
               run: |
                   cp -r static templates dist/TingJu
+                  [ -f README.md ] && cp README.md dist/TingJu/ || true
+                  [ -f LICENSE ] && cp LICENSE dist/TingJu/ || true
 
             - name: Make binary executable (Unix)
               if: runner.os != 'Windows'
