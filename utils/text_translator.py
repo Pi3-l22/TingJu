@@ -3,14 +3,17 @@ import translators as ts
 from utils.logger import logger
 
 # 翻译器列表
-TRANSLATORS = ['bing', 'Sogou', 'baidu', 'Youdao', 'alibaba', 'Caiyun', 'hujiang']
+TRANSLATORS = ['bing', 'sogou', 'youdao', 'alibaba', 'hujiang', 'iflyrec', 'caiyun', 'itranslate', 'lingvanex', 'translateCom', 'yandex']
+# alibaba apertium bing caiyun google hujiang iflyrec itranslate languageWire lingvanex modernMt myMemory qqTranSmart reverso sogou sysTran translateCom utibet yandex youdao
+# alibaba apertium bing hujiang iflyrec itranslate languageWire lingvanex qqTranSmart sogou sysTran translateCom utibet yandex youdao
+
 # 默认超时时间
-DEFAULT_TIMEOUT = 5
+DEFAULT_TIMEOUT = 5.0
 
 def init_translators():
-    ts.preaccelerate_and_speedtest(timeout=float(DEFAULT_TIMEOUT))
+    ts.preaccelerate_and_speedtest(timeout=DEFAULT_TIMEOUT)
 
-def get_text_translated(text_list: List[str], from_lang: str = 'auto', to_lang: str = 'zh') -> List[str]:
+def get_text_translated(text_list: List[str], from_lang: str = 'en', to_lang: str = 'zh') -> List[str]:
     """获取文本的翻译, 失败时尝试其他翻译器"""
     logger.info(f"正在翻译 {len(text_list)} 条文本...")
     translated_text = []
@@ -25,7 +28,7 @@ def get_text_translated(text_list: List[str], from_lang: str = 'auto', to_lang: 
                     from_language=from_lang,
                     to_language=to_lang,
                     translator=translator,
-                    timeout=float(DEFAULT_TIMEOUT)
+                    timeout=DEFAULT_TIMEOUT
                 )
                 success_count += 1
                 break  # 成功就跳出循环
