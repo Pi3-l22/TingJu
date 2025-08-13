@@ -78,11 +78,34 @@ def get_words(sentence: str) -> list[str]:
 
 def normalize_text(text: str) -> str:
     """对文本进行预处理"""
-    # 如果有连续的多个空格，则替换成单个空格
-    text = re.sub(r"\s+", " ", text)
     # 中文符号替换为英文符号
     for chinese_punct, english_punct in chinese_to_english_punctuation.items():
         text = text.replace(chinese_punct, english_punct)
+    
+    # 在标点符号后添加空格（除了引号和括号类符号）
+    # 处理句号、感叹号、问号后需要空格的情况
+    text = re.sub(r'([.!?])([^\s"])', r'\1 \2', text)
+    
+    # 处理句号、感叹号、问号在引号内的情况，在引号后添加空格
+    text = re.sub(r'([.!?])(["\'])', r'\1\2', text)  # 先确保标点和引号紧挨着
+    text = re.sub(r'([.!?]["\'])', r'\1 ', text)  # 在引号后添加空格
+    
+    # 处理括号类符号
+    text = re.sub(r'([(){}\[\]<>])', r' \1 ', text)
+    
+    # 处理逗号、分号、冒号等符号
+    text = re.sub(r'([,;:])', r'\1 ', text)
+    
+    # 处理开头引号前的空格
+    text = re.sub(r'\s+"\s+', r' "', text)
+    
+    # 处理结尾引号后的空格
+    text = re.sub(r'"\s+', r'" ', text)
+    
+    # 处理多余的空格（包括添加空格后产生的多个连续空格）
+    text = re.sub(r'\s+', ' ', text)
+    
     # 去除前后空白符
     text = text.strip()
+    
     return text
