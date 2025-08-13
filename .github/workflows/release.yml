@@ -53,6 +53,23 @@ jobs:
             #   run: |
             #       brew install upx
 
+            - name: Install 7zip (Windows)
+              if: runner.os == 'Windows'
+              shell: pwsh
+              run: |
+                  choco install 7zip -y
+
+            - name: Install 7zip (Linux)
+              if: runner.os == 'Linux'
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y p7zip-full
+
+            - name: Install 7zip (macOS)
+              if: runner.os == 'macOS'
+              run: |
+                  brew install p7zip
+
             - name: Build executable with PyInstaller
               run: |
                   pyinstaller --name TingJu --onedir --icon "${{ github.workspace }}/static/img/icon.ico" --distpath ./dist --workpath ./build --specpath ./spec app.py
@@ -68,18 +85,9 @@ jobs:
               if: runner.os != 'Windows'
               run: chmod +x dist/TingJu
 
-            - name: Create zip archive (Windows)
-              if: runner.os == 'Windows'
-              shell: pwsh
+            - name: Create zip archive with 7zip
               run: |
-                  Compress-Archive -Path dist/TingJu/* -DestinationPath TingJu-${{ github.ref_name }}-${{ matrix.asset-suffix }}.zip
-
-            - name: Create zip archive (Unix)
-              if: runner.os != 'Windows'
-              shell: bash
-              run: |
-                  cd dist/TingJu
-                  zip -r -9 "../../TingJu-${{ github.ref_name }}-${{ matrix.asset-suffix }}.zip" .
+                  7z a -tzip -mx=9 "TingJu-${{ github.ref_name }}-${{ matrix.asset-suffix }}.zip" ./dist/TingJu/*
 
             - name: Upload artifact
               uses: actions/upload-artifact@v4
