@@ -10,7 +10,15 @@ from utils.logger import logger
 AUDIO_DIR = "audios"
 
 async def list_voices(locale: str = 'en-US') -> list:
-    """列出指定语言的可用音色"""
+    """
+    列出指定语言的可用音色
+    
+    Args:
+        locale (str, optional): 语言代码，如 en-US。默认为 'en-US'
+        
+    Returns:
+        list: 音色列表
+    """
     logger.info(f"正在获取 {locale} 语言的音色列表...")
     voices_list = []
     voices = await VoicesManager.create()
@@ -26,7 +34,17 @@ async def list_voices(locale: str = 'en-US') -> list:
     return voices_list
 
 async def generate_audio(text_list: List[str], voice_name: str, title: str) -> Tuple[Path, List[str], str]:
-    """生成音频(异步)，返回音频目录路径和生成的文件名列表"""
+    """
+    生成音频(异步)
+    
+    Args:
+        text_list (List[str]): 文本列表
+        voice_name (str): 音色名称
+        title (str): 标题，用于生成音频目录名称
+        
+    Returns:
+        Tuple[Path, List[str], str]: 返回音频目录路径、生成的文件名列表和警告信息
+    """
     logger.info(f"正在生成音频文件，音色为 {voice_name} ...")
     audio_dir = _check_audio_dir(title)
     filenames = []
@@ -59,7 +77,17 @@ async def generate_audio(text_list: List[str], voice_name: str, title: str) -> T
     return audio_dir, filenames, warning_msg
     
 def generate_audio_sync(text_list: List[str], voice_name: str, title: str) -> Tuple[Path, List[str]]:
-    """生成音频(同步)，返回音频目录路径和生成的文件名列表"""
+    """
+    生成音频(同步)
+    
+    Args:
+        text_list (List[str]): 文本列表
+        voice_name (str): 音色名称
+        title (str): 标题，用于生成音频目录名称
+        
+    Returns:
+        Tuple[Path, List[str]]: 音频目录路径和生成的文件名列表
+    """
     logger.info(f"正在生成音频文件，音色为 {voice_name} ...")
     audio_dir = _check_audio_dir(title)
     filenames = []

@@ -42,7 +42,9 @@ app.mount("/templates", StaticFiles(directory="templates"), name="templates")
 templates = Jinja2Templates(directory="templates")
 
 def cleanup_temp_files():
-    """清理临时文件和音频文件"""
+    """
+    清理临时文件和音频文件
+    """
     try:
         # 清理temp目录
         temp_dir = Path(TEMP_DIR)
@@ -65,7 +67,9 @@ atexit.register(cleanup_temp_files)
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    """根路由，返回工具介绍和文件上传页面"""
+    """
+    根路由，返回工具介绍和文件上传页面
+    """
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/manual", response_class=HTMLResponse)
@@ -78,7 +82,9 @@ async def manual_input(request: Request):
 
 @app.post("/upload")
 async def upload_file(request: Request, file: UploadFile = File(...)):
-    """处理文件上传，提取文本内容"""
+    """
+    处理文件上传，提取文本内容
+    """
     # 创建临时文件保存上传的文件
     temp_dir = Path(TEMP_DIR)
     temp_dir.mkdir(exist_ok=True)
@@ -121,7 +127,9 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
 
 @app.post("/generate")
 async def generate(request: Request, text: str = Form(...), voice: str = Form(...)):
-    """处理用户确认的文本，进行分句、翻译和音频生成"""
+    """
+    处理用户确认的文本，进行分句、翻译和音频生成
+    """
     try:
         # 对文本进行分句
         sentences = get_sentences(text)
@@ -188,7 +196,9 @@ async def generate(request: Request, text: str = Form(...), voice: str = Form(..
 
 @app.get("/voices")
 async def get_voices():
-    """获取可用的音色列表"""
+    """
+    获取可用的音色列表
+    """
     try:
         voices = await list_voices()
         return {"voices": voices}
@@ -198,7 +208,9 @@ async def get_voices():
 
 @app.get("/export")
 async def export_content():
-    """导出当前结果页面和音频文件"""
+    """
+    导出当前结果页面和音频文件
+    """
     try:
         # 创建导出目录
         export_dir = Path(EXPORT_DIR)
@@ -240,7 +252,9 @@ async def export_content():
         }
 
 def save_html(title: str, data: Dict[str, List[Dict[str, str]]]):
-    """保存HTML文件"""
+    """
+    保存HTML文件
+    """
     try:
         import jinja2
         # 读取模板文件
@@ -254,7 +268,9 @@ def save_html(title: str, data: Dict[str, List[Dict[str, str]]]):
         logger.error(f"保存HTML文件失败: {e}")
         
 def get_local_ips():
-    """获取所有有效的本地IP地址"""
+    """
+    获取所有有效的本地IP地址
+    """
     import socket
     ips = []
     try:
@@ -277,7 +293,9 @@ def get_local_ips():
     return ips
 
 def open_browser(url: str):
-    """自动打开浏览器访问服务"""
+    """
+    自动打开浏览器访问服务
+    """
     import webbrowser
     import time
     time.sleep(2) # 等待2秒，确保服务启动完成

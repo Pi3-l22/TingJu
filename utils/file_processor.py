@@ -8,6 +8,15 @@ from utils.text_processor import normalize_text
 FILE_TYPES = ['.pdf', '.txt', '.docx', '.xlsx', '.pptx', '.svg', '.epub', '.mobi', '.xps', '.fb2', '.cbz']
 
 def extract_text_from_file(file_path: str) -> str:
+    """
+    提取文件中的文字
+
+    Args:
+        file_path (str): 需要提取的文件路径
+
+    Returns:
+        str: 提取到的文字信息
+    """
     # 先检查文件类型是否正确，文件是否存在
     file = Path(file_path)
     if file.suffix not in FILE_TYPES:

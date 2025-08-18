@@ -6,6 +6,7 @@ from utils.text_processor import get_sentences, init_nltk
 from utils.file_processor import extract_text_from_file
 from utils.text_translator import get_text_translated
 from utils.audio_generator import generate_audio
+from utils.language_detector import detect_language
 
 # 测试句子集合
 SENTENCES = [
@@ -48,7 +49,7 @@ class TestPerformance(unittest.TestCase):
         execution_time = end_time - start_time
         self.assertLess(execution_time, 2.0)
         
-        print(f"Sentence splitting time for {len(sentences)} sentences: {execution_time:.4f} seconds")
+        print(f"对 {len(sentences)} 个句子进行分句的耗时为 {execution_time:.4f} 秒")
     
     def test_file_processing_performance(self):
         """测试文件处理性能"""
@@ -77,7 +78,7 @@ class TestPerformance(unittest.TestCase):
         large_file.unlink()
         Path(test_dir).rmdir()
         
-        print(f"File processing time for large file: {execution_time:.4f} seconds")
+        print(f"大文件处理的耗时为 {execution_time:.4f} 秒")
     
     def test_translation_performance(self):
         """测试翻译性能"""
@@ -92,7 +93,7 @@ class TestPerformance(unittest.TestCase):
         execution_time = end_time - start_time
         self.assertLess(execution_time, 30.0)
         
-        print(f"Translation time for {len(SENTENCES)} sentences: {execution_time:.4f} seconds")
+        print(f"对 {len(SENTENCES)} 个句子进行翻译的耗时为: {execution_time:.4f} 秒")
     
     async def test_audio_generation_performance(self):
         """测试音频生成性能"""
@@ -108,7 +109,7 @@ class TestPerformance(unittest.TestCase):
         execution_time = end_time - start_time
         self.assertLess(execution_time, 30.0)  # 应该在30秒内完成
         
-        print(f"Audio generation time for {len(SENTENCES[:5])} sentences: {execution_time:.4f} seconds")
+        print(f"对 {len(SENTENCES[:5])} 个句子生成音频的耗时为 {execution_time:.4f} 秒")
         
         # 清理生成的音频文件
         try:
@@ -117,6 +118,38 @@ class TestPerformance(unittest.TestCase):
                 shutil.rmtree(audio_dir)
         except Exception as e:
             print(f"清理音频文件时出错: {e}")
+            
+    def test_detect_language_performance(self):
+        """测试语言检测性能"""
+        text_list = [
+            'Hello, how are you today?',
+            '你好，今天天气怎么样？',
+            "Salut, comment vas-tu aujourd'hui?",
+            'Hallo, wie geht es Ihnen heute?',
+            'Hola, ¿cómo estás hoy?',
+            'こんにちは、今日はどうですか?',
+            '안녕, 오늘 어때?',
+            'Привет, как ты сегодня?',
+            'Oi, como você está hoje?',
+            'Ciao, come stai oggi?'
+        ] * 100
+        
+        results = []
+        
+        start_time = time.time()
+        for text in text_list:
+            results.append(detect_language(text))
+        end_time = time.time()
+        
+        # 检查结果
+        self.assertEqual(len(results), len(text_list))
+        
+        # 检查性能
+        execution_time = end_time - start_time
+        self.assertLess(execution_time, 10.0)  # 应该在10秒内完成
+        
+        print(f"对 {len(text_list)} 条文本进行语言检测的耗时为 {execution_time:.4f} 秒")
+        
 
 if __name__ == '__main__':
     unittest.main()

@@ -5,7 +5,16 @@ from pathlib import Path
 LOG_DIR = "logs"
 
 def setup_logger(name: str = "TingJu", log_level: int = logging.INFO) -> logging.Logger:
-    """设置并返回一个日志记录器"""
+    """
+    设置并返回一个日志记录器
+    
+    Args:
+        name (str, optional): 日志记录器的名称. Defaults to "TingJu".
+        log_level (int, optional): 日志记录器的级别. Defaults to logging.INFO.
+    
+    Returns:
+        logging.Logger: 日志记录器实例
+    """
     # 创建日志目录
     log_dir = Path(LOG_DIR)
     log_dir.mkdir(exist_ok=True)

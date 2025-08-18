@@ -14,7 +14,17 @@ def init_translators():
     ts.preaccelerate_and_speedtest(timeout=DEFAULT_TIMEOUT)
 
 def get_text_translated(text_list: List[str], from_lang: str = 'en', to_lang: str = 'zh') -> List[str]:
-    """获取文本的翻译, 失败时尝试其他翻译器"""
+    """
+    获取文本的翻译, 失败时尝试其他翻译器
+    
+    Args:
+        text_list (List[str]): 需要翻译的文本列表
+        from_lang (str, optional): 源语言。默认为 'en'。
+        to_lang (str, optional): 目标语言。默认为 'zh'。
+
+    Returns:
+        List[str]: 翻译后的文本列表
+    """
     logger.info(f"正在翻译 {len(text_list)} 条文本...")
     translated_text = []
     success_count = 0
