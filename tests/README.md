@@ -4,14 +4,15 @@
 
 ```
 tests/
-├── README.md                # 测试说明文档
-├── test_app.py              # 应用程序集成测试
-├── test_audio_generator.py  # 音频生成功能测试
-├── test_file_processor.py   # 文件处理功能测试
-├── test_performance.py      # 性能测试
-├── test_text_processor.py   # 文本处理功能测试
-├── test_text_translator.py  # 文本翻译功能测试
-└── test.txt                 # 用于测试文本的文件
+├── README.md                 # 测试说明文档
+├── test_app.py               # 应用程序集成测试
+├── test_audio_generator.py   # 音频生成功能测试
+├── test_file_processor.py    # 文件处理功能测试
+├── test_language_detector.py # 语言类型检测测试
+├── test_performance.py       # 性能测试
+├── test_text_processor.py    # 文本处理功能测试
+├── test_text_translator.py   # 文本翻译功能测试
+└── test.txt                  # 用于测试文本的文件
 ```
 
 ## 测试模块说明
@@ -54,6 +55,11 @@ tests/
 - 翻译性能测试
 - 音频生成性能测试
 
+### 7. test_language_detector.py - 语言类型检测测试
+测试语言类型检测功能：
+- 语言类型检测功能
+- 不支持的语言类型的判断
+
 ## 运行测试
 
 在项目根目录下，使用以下两种方式均可运行测试。
@@ -68,6 +74,7 @@ python -m unittest discover tests
 python -m unittest tests.test_app
 python -m unittest tests.test_audio_generator
 python -m unittest tests.test_file_processor
+python -m unittest tests.test_language_detector
 python -m unittest tests.test_performance
 python -m unittest tests.test_text_processor
 python -m unittest tests.test_text_translator

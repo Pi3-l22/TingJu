@@ -6,7 +6,7 @@ class TestLanguageDetector(unittest.TestCase):
         """测试支持的语言"""
         text_list = {
             'en': 'Hello, how are you today?',
-            'zh-cn': '你好，今天天气怎么样？',
+            'zh-cn': '你好，你今天怎么样？',
             'fr': "Salut, comment vas-tu aujourd'hui?",
             'de': 'Hallo, wie geht es Ihnen heute?',
             'es': 'Hola, ¿cómo estás hoy?',

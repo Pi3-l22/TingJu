@@ -1,19 +1,19 @@
 from langdetect import detect, detect_langs
 from langdetect.lang_detect_exception import LangDetectException
-# from utils.logger import logger
+from utils.logger import logger
 
 # 语言代码映射表
 LANGUAGE_CODES = {
-    'en': 'English',     # 英语
-    'zh-cn': 'Chinese',  # 中文
-    'fr': 'French',      # 法语
-    'de': 'German',      # 德语
-    'es': 'Spanish',     # 西班牙语
-    'ja': 'Japanese',    # 日语
-    'ko': 'Korean',      # 韩语
-    'ru': 'Russian',     # 俄语
-    'pt': 'Portuguese',  # 葡萄牙语
-    'it': 'Italian'      # 意大利语
+    'en': 'english',     # 英语
+    'zh-cn': 'chinese',  # 中文
+    'fr': 'french',      # 法语
+    'de': 'german',      # 德语
+    'es': 'spanish',     # 西班牙语
+    'ja': 'japanese',    # 日语
+    'ko': 'korean',      # 韩语
+    'ru': 'russian',     # 俄语
+    'pt': 'portuguese',  # 葡萄牙语
+    'it': 'italian'      # 意大利语
 }
 
 # TTS地区代码映射表
@@ -73,7 +73,7 @@ def detect_language(text: str) -> dict:
             'locale': tts_locale
         }
     except LangDetectException as e:
-        # logger.error(f"语言类型检测失败: {str(e)}")
+        logger.error(f"语言类型检测失败: {str(e)}")
         return {
             'error': '无法检测出文本的语言类型',
             'code': None,
@@ -81,7 +81,7 @@ def detect_language(text: str) -> dict:
             'locale': None
         }
     except Exception as e:
-        # logger.error(f"语言类型检测过程中发生错误: {str(e)}")
+        logger.error(f"语言类型检测过程中发生错误: {str(e)}")
         return {
             'error': '语言类型检测过程出错',
             'code': None,

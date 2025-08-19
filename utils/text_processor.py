@@ -23,10 +23,31 @@ chinese_to_english_punctuation = {
     '，': ',',
     '。': '.',
     '！': '!',
-    '——': '-',  # 中文破折号
-    '－': '-',  # 中文连字符
-    '·': '.',  # 中点
-    '…': '...',  # 省略号
+    '——': '-',
+    '－': '-',
+    '·': '.',
+    '...': '…',
+}
+
+# 替换为日文符号
+to_japanese_punctuation = {
+    '...': '…',
+    '???': '…',
+    '？？？': '…',
+    '.': '。',
+    '?': '？',
+    '!': '！',
+    ',': '，',
+    '[': '「',
+    ']': '」',
+    '【': '『',
+    '】': '』',
+    '(': '（',
+    ')': '）',
+    '“': '『',
+    '”': '』',
+    '‘': "「",
+    '’': "」",
 }
 
 def init_nltk():
@@ -61,7 +82,7 @@ def init_nltk():
     finally:
         logger.info("nltk 库初始化完成")
     
-def get_sentences(paragraph: str) -> list[str]: 
+def get_sentences(paragraph: str, lang: str = "english") -> list[str]: 
     """
     将段落分成句子
     
@@ -72,29 +93,38 @@ def get_sentences(paragraph: str) -> list[str]:
         list[str]: 分割后的句子列表
     """
     # 先规范化文本，防止分句错误
-    paragraph = normalize_text(paragraph)
-    sentences = nltk.sent_tokenize(paragraph)
+    paragraph = normalize_text(text=paragraph, lang=lang)
+    
+    # 如果语言是日语、韩语，则手动处理分句
+    if lang in ['japanese', 'korean']:
+        sentences = _get_sentences_from_ja_ko(text=paragraph)
+    else:
+        sentences = nltk.sent_tokenize(text=paragraph, language=lang)
+        
     # 如果句子字符数少于3个字符，则忽略
     sentences = [s for s in sentences if len(s) > 2]
     logger.info(f"段落分割完成，共 {len(sentences)} 个句子")
     return sentences
 
-def get_words(sentence: str) -> list[str]:
+def _get_sentences_from_ja_ko(text: str) -> list[str]:
     """
-    将句子分成单词
+    手动处理日语、韩语分句
     
     Args:
-        sentence (str): 待处理的句子
-        
-    Returns:
-        list[str]: 分割后的单词列表
-    """
-    sentence = normalize_text(sentence)
-    words = nltk.word_tokenize(sentence)
-    logger.info(f"句子分割完成，共 {len(words)} 个单词")
-    return words
+        text (str): 待处理的文本
 
-def normalize_text(text: str) -> str:
+    Returns:
+        list[str]: 分割后的句子列表
+    """
+    dots_pattern = re.compile(r'\.{3,}')  # 匹配三个或更多连续的.
+    pattern = re.compile(
+        r'(?<=[。！？!?.])'  # 仅在这些符号后断句
+        r'(?!\s*[」』（）】\'\"’”])'  # 且后面不能紧跟右括号/右引号
+    )
+    text = dots_pattern.sub('…', text)
+    return [s.strip() for s in pattern.split(text) if s.strip()]
+
+def normalize_text(text: str, lang: str = 'english') -> str:
     """
     对文本进行预处理
     
@@ -104,9 +134,17 @@ def normalize_text(text: str) -> str:
     Returns:
         str: 处理后的文本
     """
-    # 中文符号替换为英文符号
-    for chinese_punct, english_punct in chinese_to_english_punctuation.items():
-        text = text.replace(chinese_punct, english_punct)
+    if lang == 'japanese':
+        # 符号替换为日文符号
+        for punct, japanese_punct in to_japanese_punctuation.items():
+            text = text.replace(punct, japanese_punct)
+        
+        jp_punctuation = r'[。！？、，；：…」』）]'
+        text = re.sub(f'({jp_punctuation})\\s+', r'\1', text)
+    else:
+        # 中文符号替换为英文符号
+        for chinese_punct, english_punct in chinese_to_english_punctuation.items():
+            text = text.replace(chinese_punct, english_punct)
     
     # 在标点符号后添加空格（除了引号和括号类符号）
     # 处理句号、感叹号、问号后需要空格的情况
