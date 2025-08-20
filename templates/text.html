@@ -25,7 +25,23 @@
                 {% endif %}
             </div>
 
-            <div class="voice-selector">
+            <div class="selector">
+                <label for="lang-select">选择语言:</label>
+                <select id="lang-select" name="lang">
+                    <option value="">加载中...</option>
+                </select>
+                <div id="lang-status" style="margin-top: 20px;">
+                    {% if not detect_error %}
+                    <span class="success" data-locale="{{ detect_locale }}">
+                        ⓘ 检测到语言类型为 {{ detect_name }}，若识别错误请手动选择
+                    </span>
+                    {% elif detect_error %}
+                    <span class="warning">⚠ {{ detect_error }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="selector">
                 <label for="voice-select">选择音色:</label>
                 <select id="voice-select" name="voice">
                     <option value="">加载中...</option>

@@ -14,6 +14,7 @@ from utils.file_processor import extract_text_from_file
 from utils.text_processor import init_nltk, get_sentences
 from utils.text_translator import get_text_translated
 from utils.audio_generator import generate_audio, list_voices, AUDIO_DIR
+from utils.language_detector import detect_language, LANGUAGE_CODES, LANGUAGE_NAMES, TTS_LOCALES
 from utils.logger import logger
 
 # 存储临时文件路径的全局变量
@@ -70,6 +71,11 @@ async def read_root(request: Request):
     """
     根路由，返回工具介绍和文件上传页面
     """
+    # 清理全局变量
+    global TEMP_FILE_PATH, CURRENT_UUID
+    TEMP_FILE_PATH = None
+    CURRENT_UUID = ""
+    
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/manual", response_class=HTMLResponse)
@@ -104,10 +110,17 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
     try:
         extracted_text = extract_text_from_file(str(temp_file_path))
         if not extracted_text:
-            return templates.TemplateResponse("index.html", {
+            return templates.TemplateResponse("text.html", {
                 "request": request,
-                "error": "无法从文件中提取文本，请确保文件格式正确且包含文本内容。"
+                "error": "无法从文件中提取文本，请确保文件格式正确且包含文本内容，再重新上传或手动填写",
+                "text": ""
             })
+        
+        # 检测语言类型
+        detect_result = detect_language(extracted_text)
+        detect_error = detect_result.get("error")
+        detect_name = detect_result.get("name")
+        detect_locale = detect_result.get("locale")
         
         # 保存临时文件路径到全局变量
         global TEMP_FILE_PATH
@@ -116,23 +129,27 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
         # 跳转到文本确认页面
         return templates.TemplateResponse("text.html", {
             "request": request,
-            "text": extracted_text
+            "text": extracted_text,
+            "detect_error": detect_error,
+            "detect_name": str(detect_name).capitalize(),
+            "detect_locale": detect_locale,
         })
     except Exception as e:
         logger.error(f"处理文件 {file.filename} 时出错: {str(e)}")
-        return templates.TemplateResponse("index.html", {
+        return templates.TemplateResponse("text.html", {
             "request": request,
-            "error": f"处理文件时出错: {str(e)}"
+            "error": f"处理文件时出错，请使用手动填写: {str(e)}",
+            "text": ""
         })
 
 @app.post("/generate")
-async def generate(request: Request, text: str = Form(...), voice: str = Form(...)):
+async def generate(request: Request, text: str = Form(...), voice: str = Form(...), lang: str = Form(...)):
     """
     处理用户确认的文本，进行分句、翻译和音频生成
     """
     try:
         # 对文本进行分句
-        sentences = get_sentences(text)
+        sentences = get_sentences(paragraph=text, lang=LANGUAGE_CODES.get(lang, "english"))
         
         if not sentences:
             return templates.TemplateResponse("text.html", {
@@ -145,7 +162,8 @@ async def generate(request: Request, text: str = Form(...), voice: str = Form(..
         title = str(uuid.uuid4())[:8]
         
         # 翻译句子
-        translated_sentences = get_text_translated(sentences)
+        lang_code = lang if lang in LANGUAGE_CODES else "en"
+        translated_sentences = get_text_translated(sentences, from_lang=lang_code)
         
         # 生成音频
         voice_name = voice if voice else "en-US-ChristopherNeural"
@@ -195,16 +213,35 @@ async def generate(request: Request, text: str = Form(...), voice: str = Form(..
         })
 
 @app.get("/voices")
-async def get_voices():
+async def get_voices(locale: str = "en-US"):
     """
     获取可用的音色列表
     """
     try:
-        voices = await list_voices()
+        voices = await list_voices(locale)
         return {"voices": voices}
     except Exception as e:
         logger.error(f"获取音色列表时出错: {str(e)}")
         return {"error": f"获取音色列表时出错: {str(e)}"}
+
+@app.get("/languages")
+async def get_languages():
+    """
+    获取支持的语言列表
+    """
+    try:
+        languages = []
+        for code, name in LANGUAGE_CODES.items():
+            languages.append({
+                "code": code,
+                "name": name.capitalize(),
+                "zh_name": LANGUAGE_NAMES.get(code, ''),
+                "locale": TTS_LOCALES.get(code, '')
+            })
+        return {"languages": languages}
+    except Exception as e:
+        logger.error(f"获取语言列表时出错: {str(e)}")
+        return {"error": f"获取语言列表时出错: {str(e)}"}
 
 @app.get("/export")
 async def export_content():

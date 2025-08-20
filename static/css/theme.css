@@ -1,7 +1,9 @@
 /* 引入 Google 字体 */
-@import url("https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Bree+Serif&family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@100..900&family=Noto+Serif+SC:wght@200..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Outfit:wght@100..900&family=Pacifico&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Bree+Serif&family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@100..900&family=Noto+Serif+SC:wght@200..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Outfit:wght@100..900&family=Pacifico&family=Noto+Sans+JP:wght@100..900&family=Noto+Sans+KR:wght@100..900&family=Noto+Serif+JP:wght@200..900&family=Noto+Serif+KR:wght@200..900&display=swap"); */
+@import url("https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Bree+Serif&family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&family=Ma+Shan+Zheng&family=Noto+Sans+JP:wght@100..900&family=Noto+Sans+KR:wght@100..900&family=Noto+Sans+SC:wght@100..900&family=Noto+Serif+JP:wght@200..900&family=Noto+Serif+KR:wght@200..900&family=Noto+Serif+SC:wght@200..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Outfit:wght@100..900&family=Pacifico&display=swap");
 /* Ma Shan Zheng, Pacifico */
-/* Bree Serif, Arvo, Outfit, Nunito, Google Sans Code, Noto Sans SC, Noto Serif SC */
+/* Bree Serif, Arvo, Outfit, Nunito, Google Sans Code,  */
+/* Noto Sans SC, Noto Serif SC, Noto Sans JP, Noto Serif JP, Noto Sans KR, Noto Serif KR */
 
 /* 统一主题颜色配置 */
 :root {
@@ -44,7 +46,7 @@
 	--title-font: "Pacifico", "Ma Shan Zheng", var(--text-font);
 	--mono-font: "Google Sans Code", "SF Mono", "Consolas", Menlo, "Noto Sans SC", monospace;
 	--text-font: "Noto Sans SC", sans-serif;
-	--sentence-font: "Noto Sans SC", Arial, sans-serif;
+	--sentence-font: "Noto Sans SC", "Noto Sans KR", "Noto Sans JP", Arial, sans-serif;
 }
 
 [data-theme="blue"] {
@@ -205,25 +207,25 @@
 /* 字体主题 */
 [font-theme="Outfit"] {
 	--text-font: "Noto Sans SC", sans-serif;
-	--sentence-font: "Outfit", Arial, sans-serif;
+	--sentence-font: "Outfit", "Noto Sans KR", "Noto Sans JP", Arial, sans-serif;
 }
 
 [font-theme="Nunito"] {
 	--text-font: "Noto Sans SC", sans-serif;
-	--sentence-font: "Nunito", Arial, sans-serif;
+	--sentence-font: "Nunito", "Noto Sans KR", "Noto Sans JP", Arial, sans-serif;
 }
 
 [font-theme="Source-Serif"] {
 	--text-font: "Noto Serif SC", serif;
-	--sentence-font: "Noto Serif SC", "Times New Roman", Times, serif;
+	--sentence-font: "Noto Serif SC", "Noto Serif KR", "Noto Serif JP", "Times New Roman", Times, serif;
 }
 
 [font-theme="Arvo"] {
 	--text-font: "Noto Sans SC", sans-serif;
-	--sentence-font: "Arvo", "Times New Roman", Times, serif;
+	--sentence-font: "Arvo", "Noto Serif KR", "Noto Serif JP", "Times New Roman", Times, serif;
 }
 
 [font-theme="Bree-Serif"] {
 	--text-font: "Noto Sans SC", sans-serif;
-	--sentence-font: "Bree Serif", "Times New Roman", Times, serif;
+	--sentence-font: "Bree Serif", "Noto Serif KR", "Noto Serif JP", "Times New Roman", Times, serif;
 }

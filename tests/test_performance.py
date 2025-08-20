@@ -123,7 +123,6 @@ class TestPerformance(unittest.TestCase):
         """测试语言检测性能"""
         text_list = [
             'Hello, how are you today?',
-            '你好，今天天气怎么样？',
             "Salut, comment vas-tu aujourd'hui?",
             'Hallo, wie geht es Ihnen heute?',
             'Hola, ¿cómo estás hoy?',

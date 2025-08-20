@@ -40,8 +40,11 @@ def extract_text_from_file(file_path: str) -> str:
             text += page_str
             logger.debug(f"{file.name} 页 {page.number} 提取文字成功")
         
-        # 规范化文本
-        text = normalize_text(text)
+        # 处理多余的空格（包括添加空格后产生的多个连续空格）
+        text = re.sub(r'\s+', ' ', text)
+        
+        # 去除前后空白符
+        text = text.strip()
         
         logger.info(f"{file.name} 提取文字完成")
         return text

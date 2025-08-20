@@ -5,27 +5,37 @@ from utils.logger import logger
 # 语言代码映射表
 LANGUAGE_CODES = {
     'en': 'english',     # 英语
-    'zh-cn': 'chinese',  # 中文
     'fr': 'french',      # 法语
     'de': 'german',      # 德语
-    'es': 'spanish',     # 西班牙语
     'ja': 'japanese',    # 日语
     'ko': 'korean',      # 韩语
     'ru': 'russian',     # 俄语
+    'es': 'spanish',     # 西班牙语
     'pt': 'portuguese',  # 葡萄牙语
     'it': 'italian'      # 意大利语
+}
+
+LANGUAGE_NAMES= {
+    'en': '英语',
+    'fr': '法语',
+    'de': '德语',
+    'ja': '日语',
+    'ko': '韩语',
+    'ru': '俄语',
+    'es': '西班牙语',
+    'pt': '葡萄牙语',
+    'it': '意大利语'
 }
 
 # TTS地区代码映射表
 TTS_LOCALES = {
     'en': 'en-US',     # 英语(美国)
-    'zh-cn': 'zh-CN',  # 中文(大陆)
     'fr': 'fr-FR',     # 法语(法国)
     'de': 'de-DE',     # 德语(德国)
-    'es': 'es-ES',     # 西班牙语(西班牙)
     'ja': 'ja-JP',     # 日语(日本)
     'ko': 'ko-KR',     # 韩语(韩国)
     'ru': 'ru-RU',     # 俄语(俄罗斯)
+    'es': 'es-ES',     # 西班牙语(西班牙)
     'pt': 'pt-PT',     # 葡萄牙语(葡萄牙)
     'it': 'it-IT',     # 意大利语(意大利)
 }
@@ -46,11 +56,20 @@ def detect_language(text: str) -> dict:
         
         # 获取所有可能的语言及其概率
         # lang_probs = detect_langs(text)
+        
+        # 判断语言是否为中文
+        if detected_lang == 'zh-cn':
+            return {
+                'error': '识别到语言类型为zh-cn，不支持学习中文，若识别错误，请手动选择语言类型',
+                'code': None,
+                'name': None,
+                'locale': None
+            }
 
         # 判断语言是否在语言代码列表中
         if detected_lang not in LANGUAGE_CODES:
             return {
-                'error': f'语言类型 {detected_lang} 不支持',
+                'error': f'不支持语言类型{detected_lang}，若识别错误，请手动选择语言类型',
                 'code': None,
                 'name': None,
                 'locale': None
@@ -75,7 +94,7 @@ def detect_language(text: str) -> dict:
     except LangDetectException as e:
         logger.error(f"语言类型检测失败: {str(e)}")
         return {
-            'error': '无法检测出文本的语言类型',
+            'error': '无法检测出文本的语言类型，请检查文本并手动选择语言类型',
             'code': None,
             'name': None,
             'locale': None
@@ -83,7 +102,7 @@ def detect_language(text: str) -> dict:
     except Exception as e:
         logger.error(f"语言类型检测过程中发生错误: {str(e)}")
         return {
-            'error': '语言类型检测过程出错',
+            'error': '语言类型检测过程出错，，请检查文本并手动选择语言类型',
             'code': None,
             'name': None,
             'locale': None

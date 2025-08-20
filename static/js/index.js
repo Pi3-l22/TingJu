@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const uploadBtn = document.getElementById('upload-btn');
     const fileName = document.getElementById('file-name');
     const manualBtn = document.getElementById('manual-btn');
+    const uploadForm = document.getElementById('upload-form');
+    const loadingOverlay = document.getElementById('loading-overlay');
 
     if (browseBtn) {
         browseBtn.addEventListener('click', () => {
@@ -76,6 +78,16 @@ document.addEventListener('DOMContentLoaded', function () {
     if (manualBtn) {
         manualBtn.addEventListener('click', () => {
             window.location.href = '/manual';
+        });
+    }
+
+    // 表单提交事件 显示加载动画
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', function (e) {
+            // 显示加载动画
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'flex';
+            }
         });
     }
 
