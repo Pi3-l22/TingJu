@@ -8,6 +8,13 @@ class TestTextProcessor(unittest.TestCase):
         text = "This   is a  test sentence。Some people may wonder，“How long does it take to form a habit？”This is a another test sentence！"
         normalized_text = normalize_text(text)
         self.assertEqual(normalized_text, 'This is a test sentence. Some people may wonder, "How long does it take to form a habit?" This is a another test sentence!')
+
+        # 回归测试：专有缩写和小数不应被错误插入空格
+        edge_text = "by C. Liu, et al., we compare TLS 1.3 in detail."
+        normalized_edge_text = normalize_text(edge_text)
+        self.assertIn("et al.,", normalized_edge_text)
+        self.assertIn("TLS 1.3", normalized_edge_text)
+
         ja_text = '今日はいい天気だ...でも“急に雨が降り出した!”と彼は叫んだ. 明日の予定は? (キャンプを中止する) みんなで“楽しみにしていた”イベントだったのに…本当に残念ですね。'
         normalized_text = normalize_text(ja_text, 'japanese')
         self.assertEqual(normalized_text, '今日はいい天気だ…でも『急に雨が降り出した！』と彼は叫んだ。明日の予定は？（キャンプを中止する）みんなで『楽しみにしていた』イベントだったのに…本当に残念ですね。')
@@ -47,6 +54,43 @@ class TestTextProcessor(unittest.TestCase):
         for lang, text in texts.items():
             sentences = get_sentences(text, lang)
             self.assertEqual(len(sentences), 2)
+
+    def test_get_sentences_with_abbreviation_and_decimal(self):
+        """回归测试：缩写 + 小数场景不应导致误拆分"""
+        init_nltk()
+        text = "This was reported by C. Liu, et al., in TLS 1.3 research. The result is stable."
+        sentences = get_sentences(text, 'english')
+        self.assertEqual(len(sentences), 2)
+        self.assertIn("et al.,", sentences[0])
+        self.assertIn("TLS 1.3", sentences[0])
+
+    def test_normalize_text_special_cases(self):
+        """更多特殊情况：缩写链、版本号、URL、邮箱、数字格式"""
+        text = (
+            "In the U.S.A.we use v3.10 and TLS 1.3.This is common!"
+            "Contact me at test@example.com,and check https://example.com/docs."
+            "The budget is 1,000.25 at 12:30."
+        )
+        normalized = normalize_text(text)
+
+        self.assertIn("U.S.A.", normalized)
+        self.assertIn("v3.10", normalized)
+        self.assertIn("TLS 1.3", normalized)
+        self.assertIn("test@example.com", normalized)
+        self.assertIn("https://example.com/docs", normalized)
+        self.assertIn("1,000.25", normalized)
+        self.assertIn("12:30", normalized)
+        self.assertIn("This is common! Contact", normalized)
+
+    def test_get_sentences_with_acronym_and_url(self):
+        """回归测试：缩写链与URL不应导致误拆分"""
+        init_nltk()
+        text = "In the U.S.A. we test TLS 1.3. Read more at https://example.com/docs. This is final."
+        sentences = get_sentences(text, 'english')
+        self.assertEqual(len(sentences), 3)
+        self.assertIn("U.S.A.", sentences[0])
+        self.assertIn("TLS 1.3", sentences[0])
+        self.assertIn("https://example.com/docs.", sentences[1])
         
 
 if __name__ == '__main__':

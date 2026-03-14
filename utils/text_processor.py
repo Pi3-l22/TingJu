@@ -145,10 +145,29 @@ def normalize_text(text: str, lang: str = 'english') -> str:
         # 中文符号替换为英文符号
         for chinese_punct, english_punct in chinese_to_english_punctuation.items():
             text = text.replace(chinese_punct, english_punct)
+
+        # 先保护高风险片段，避免后续正则误插空格导致语义破坏
+        protected_tokens = []
+
+        def _protect(pattern: str):
+            nonlocal text
+
+            def _repl(match: re.Match) -> str:
+                protected_tokens.append(match.group(0))
+                return f"__PROTECTED_TOKEN_{len(protected_tokens)-1}__"
+
+            text = re.sub(pattern, _repl, text)
+
+        _protect(r'https?://[^\s<>"\']+|www\.[^\s<>"\']+')
+        _protect(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
+        _protect(r'\b(?:[A-Za-z]\.){2,}')
+        _protect(r'\b\d+(?:\.\d+){1,}\b')
     
-    # 在标点符号后添加空格（除了引号和括号类符号）
-    # 处理句号、感叹号、问号后需要空格的情况
-    text = re.sub(r'([.!?])([^\s"])', r'\1 \2', text)
+    # 在句末符号后按需补空格：
+    # 1) 仅在更像“句子边界”时补空格（例如后续是大写开头或引号/括号）
+    # 2) 避免打断缩写链（U.S.A.）、版本号/小数（3.10 / 1.3）
+    text = re.sub(r'([!?])(?=[^\s"\'\)\]\},.;:!?])', r'\1 ', text)
+    text = re.sub(r'(?<!\d)\.(?!\d)(?=[A-Z"\'\(\[])', r'. ', text)
     
     # 处理句号、感叹号、问号在引号内的情况，在引号后添加空格
     text = re.sub(r'([.!?])(["\'])', r'\1\2', text)  # 先确保标点和引号紧挨着
@@ -157,8 +176,12 @@ def normalize_text(text: str, lang: str = 'english') -> str:
     # 处理括号类符号
     text = re.sub(r'([(){}\[\]<>])', r' \1 ', text)
     
-    # 处理逗号、分号、冒号等符号
-    text = re.sub(r'([,;:])', r'\1 ', text)
+    # 处理逗号、分号、冒号等符号：
+    # 1) 千分位数字（1,000）不加空格
+    # 2) 时间格式（12:30）不加空格
+    text = re.sub(r'(?<=\D),(?=\S)', r', ', text)
+    text = re.sub(r';(?=\S)', r'; ', text)
+    text = re.sub(r'(?<!\d):(?=\S)', r': ', text)
     
     # 处理开头引号前的空格
     text = re.sub(r'\s+"\s+', r' "', text)
@@ -171,5 +194,10 @@ def normalize_text(text: str, lang: str = 'english') -> str:
     
     # 去除前后空白符
     text = text.strip()
+
+    # 还原被保护片段
+    if lang != 'japanese':
+        for i, token in enumerate(protected_tokens):
+            text = text.replace(f"__PROTECTED_TOKEN_{i}__", token)
     
     return text
