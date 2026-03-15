@@ -1,9 +1,38 @@
 import re
-import nltk
+from functools import lru_cache
 from pathlib import Path
+
+import nltk
+
 from utils.logger import logger
 
+try:
+    import pysbd
+except ImportError:
+    pysbd = None
+
 DATA_DIR = "nltk_data"
+
+PYSBD_LANGUAGE_CODES = {
+    'english': 'en',
+    'french': 'fr',
+    'german': 'de',
+    'spanish': 'es',
+    'italian': 'it',
+    'russian': 'ru',
+}
+
+PROTECTED_PATTERNS = (
+    r'https?://[^\s<>"\']+|www\.[^\s<>"\']+',
+    r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}',
+    r'\b(?:[A-Za-z]\.){2,}',
+    r'\b[A-Za-z]*\d+(?:\.\d+){1,}\b',
+)
+
+FAST_SPLIT_TEXT_THRESHOLD = 50000
+
+LEADING_CLOSER_PATTERN = re.compile(r'^([\'"”’」』）】\]\}]+[.,!?;:…]*)\s*(.*)$')
+PUNCTUATION_FRAGMENT_PATTERN = re.compile(r'^[\'"“”‘’「」『』()\[\]{}<>.,!?;:…]+$')
 
 # 中文符号替换为英文符号
 chinese_to_english_punctuation = {
@@ -92,19 +121,61 @@ def get_sentences(paragraph: str, lang: str = "english") -> list[str]:
     Returns:
         list[str]: 分割后的句子列表
     """
-    # 先规范化文本，防止分句错误
-    paragraph = normalize_text(text=paragraph, lang=lang)
-    
-    # 如果语言是日语、韩语，则手动处理分句
+    normalized_text = normalize_text(text=paragraph, lang=lang)
+    splitter_input = _prepare_splitter_text(text=normalized_text, lang=lang)
+
     if lang in ['japanese', 'korean']:
-        sentences = _get_sentences_from_ja_ko(text=paragraph)
+        sentences = _get_sentences_from_ja_ko(text=splitter_input)
     else:
-        sentences = nltk.sent_tokenize(text=paragraph, language=lang)
-        
-    # 如果句子字符数少于3个字符，则忽略
-    sentences = [s for s in sentences if len(s) > 2]
+        sentences = _split_sentences(text=splitter_input, lang=lang)
+
+    sentences = _postprocess_sentences(sentences=sentences, lang=lang)
+    sentences = [sentence for sentence in sentences if len(sentence) > 2]
     logger.info(f"段落分割完成，共 {len(sentences)} 个句子")
     return sentences
+
+
+def _split_sentences(text: str, lang: str) -> list[str]:
+    """根据语言选择合适的分句器。"""
+    if len(text) >= FAST_SPLIT_TEXT_THRESHOLD:
+        return _fast_split_sentences(text)
+
+    segmenter = _get_pysbd_segmenter(lang)
+    if segmenter is not None:
+        try:
+            return segmenter.segment(text)
+        except Exception as error:
+            logger.warning(f"PySBD 分句失败，回退到 NLTK: {error}")
+
+    init_nltk()
+    return nltk.sent_tokenize(text=text, language=lang)
+
+
+def _fast_split_sentences(text: str) -> list[str]:
+    """大文本场景下的快速回退分句，优先保证性能。"""
+    protected_text, protected_tokens = _protect_text_fragments(text)
+    matches = re.findall(r'.+?(?:[.!?]["”’）\]\}]*)(?=\s+|$)|.+$', protected_text)
+    return [
+        _restore_text_fragments(match.strip(), protected_tokens)
+        for match in matches
+        if match.strip()
+    ]
+
+
+@lru_cache(maxsize=None)
+def _get_pysbd_segmenter(lang: str):
+    """缓存 PySBD 分句器，避免重复初始化。"""
+    if pysbd is None:
+        return None
+
+    language_code = PYSBD_LANGUAGE_CODES.get(lang)
+    if language_code is None:
+        return None
+
+    try:
+        return pysbd.Segmenter(language=language_code, clean=False)
+    except ValueError:
+        return None
 
 def _get_sentences_from_ja_ko(text: str) -> list[str]:
     """
@@ -123,6 +194,88 @@ def _get_sentences_from_ja_ko(text: str) -> list[str]:
     )
     text = dots_pattern.sub('…', text)
     return [s.strip() for s in pattern.split(text) if s.strip()]
+
+
+def _prepare_splitter_text(text: str, lang: str) -> str:
+    """仅为分句器补充必要边界提示，避免污染原始语义。"""
+    if lang in ['japanese', 'korean']:
+        return text.strip()
+
+    text, protected_tokens = _protect_text_fragments(text)
+    text = re.sub(r'([.!?]["\'”’)\]\}]*)(?=(?:["“‘(\[]?[A-ZА-ЯЁ0-9]))', r'\1 ', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    return _restore_text_fragments(text, protected_tokens)
+
+
+def _postprocess_sentences(sentences: list[str], lang: str) -> list[str]:
+    """修正被错误拆开的尾引号、括号和纯标点碎片。"""
+    merged_sentences = []
+    for raw_sentence in sentences:
+        sentence = raw_sentence.strip()
+        if not sentence:
+            continue
+
+        sentence = _merge_leading_closers(merged_sentences, sentence)
+        if sentence is None:
+            continue
+
+        sentence = _finalize_sentence(sentence, lang)
+        if sentence:
+            merged_sentences.append(sentence)
+
+    return merged_sentences
+
+
+def _merge_leading_closers(sentences: list[str], sentence: str) -> str | None:
+    """把落到下一句开头的右引号、右括号或尾部标点并回前一句。"""
+    if not sentences:
+        return sentence
+
+    if PUNCTUATION_FRAGMENT_PATTERN.fullmatch(sentence):
+        sentences[-1] += sentence
+        return None
+
+    match = LEADING_CLOSER_PATTERN.match(sentence)
+    if match is None:
+        return sentence
+
+    sentences[-1] += match.group(1)
+    remainder = match.group(2).strip()
+    return remainder or None
+
+
+def _finalize_sentence(sentence: str, lang: str) -> str:
+    """对单个句子做轻量收尾，避免空格落在标点和闭合符号前。"""
+    if lang == 'japanese':
+        return sentence.strip()
+
+    sentence = re.sub(r'([.!?])\s+(["”’])', r'\1\2', sentence)
+    sentence = re.sub(r'\s+([,.;:!?])', r'\1', sentence)
+    sentence = re.sub(r'\s+([”’」』）】\]\}])', r'\1', sentence)
+    sentence = re.sub(r'([(\[])(\s+)', r'\1', sentence)
+    sentence = re.sub(r'\s+', ' ', sentence)
+    return sentence.strip()
+
+
+def _protect_text_fragments(text: str) -> tuple[str, list[str]]:
+    """保护 URL、邮箱、缩写链和数字版本号，防止空格调整误伤。"""
+    protected_tokens: list[str] = []
+
+    def replace_match(match: re.Match) -> str:
+        protected_tokens.append(match.group(0))
+        return f"__PROTECTED_TOKEN_{len(protected_tokens) - 1}__"
+
+    for pattern in PROTECTED_PATTERNS:
+        text = re.sub(pattern, replace_match, text)
+
+    return text, protected_tokens
+
+
+def _restore_text_fragments(text: str, protected_tokens: list[str]) -> str:
+    """还原被占位符替换的特殊片段。"""
+    for index, token in enumerate(protected_tokens):
+        text = text.replace(f"__PROTECTED_TOKEN_{index}__", token)
+    return text
 
 def normalize_text(text: str, lang: str = 'english') -> str:
     """
@@ -146,58 +299,18 @@ def normalize_text(text: str, lang: str = 'english') -> str:
         for chinese_punct, english_punct in chinese_to_english_punctuation.items():
             text = text.replace(chinese_punct, english_punct)
 
-        # 先保护高风险片段，避免后续正则误插空格导致语义破坏
-        protected_tokens = []
+        text, protected_tokens = _protect_text_fragments(text)
+        text = re.sub(r'(?<=\D),(?=\S)', r', ', text)
+        text = re.sub(r';(?=\S)', r'; ', text)
+        text = re.sub(r'(?<!\d):(?=\S)', r': ', text)
+        text = re.sub(r'([.!?]["”’）\]\}]*)(?=(?:["“‘(\[]?[A-ZА-ЯЁ0-9]))', r'\1 ', text)
+        text = re.sub(r'([.!?])\s+(["”’])', r'\1\2', text)
+        text = re.sub(r'\s+([,.;:!?])', r'\1', text)
+        text = re.sub(r'([(\[])(\s+)', r'\1', text)
+        text = re.sub(r'\s+([”’)\]\}])', r'\1', text)
+        text = re.sub(r'\s+', ' ', text).strip()
+        text = _restore_text_fragments(text, protected_tokens)
 
-        def _protect(pattern: str):
-            nonlocal text
-
-            def _repl(match: re.Match) -> str:
-                protected_tokens.append(match.group(0))
-                return f"__PROTECTED_TOKEN_{len(protected_tokens)-1}__"
-
-            text = re.sub(pattern, _repl, text)
-
-        _protect(r'https?://[^\s<>"\']+|www\.[^\s<>"\']+')
-        _protect(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
-        _protect(r'\b(?:[A-Za-z]\.){2,}')
-        _protect(r'\b\d+(?:\.\d+){1,}\b')
-    
-    # 在句末符号后按需补空格：
-    # 1) 仅在更像“句子边界”时补空格（例如后续是大写开头或引号/括号）
-    # 2) 避免打断缩写链（U.S.A.）、版本号/小数（3.10 / 1.3）
-    text = re.sub(r'([!?])(?=[^\s"\'\)\]\},.;:!?])', r'\1 ', text)
-    text = re.sub(r'(?<!\d)\.(?!\d)(?=[A-Z"\'\(\[])', r'. ', text)
-    
-    # 处理句号、感叹号、问号在引号内的情况，在引号后添加空格
-    text = re.sub(r'([.!?])(["\'])', r'\1\2', text)  # 先确保标点和引号紧挨着
-    text = re.sub(r'([.!?]["\'])', r'\1 ', text)  # 在引号后添加空格
-    
-    # 处理括号类符号
-    text = re.sub(r'([(){}\[\]<>])', r' \1 ', text)
-    
-    # 处理逗号、分号、冒号等符号：
-    # 1) 千分位数字（1,000）不加空格
-    # 2) 时间格式（12:30）不加空格
-    text = re.sub(r'(?<=\D),(?=\S)', r', ', text)
-    text = re.sub(r';(?=\S)', r'; ', text)
-    text = re.sub(r'(?<!\d):(?=\S)', r': ', text)
-    
-    # 处理开头引号前的空格
-    text = re.sub(r'\s+"\s+', r' "', text)
-    
-    # 处理结尾引号后的空格
-    text = re.sub(r'"\s+', r'" ', text)
-    
-    # 处理多余的空格（包括添加空格后产生的多个连续空格）
-    text = re.sub(r'\s+', ' ', text)
-    
-    # 去除前后空白符
-    text = text.strip()
-
-    # 还原被保护片段
-    if lang != 'japanese':
-        for i, token in enumerate(protected_tokens):
-            text = text.replace(f"__PROTECTED_TOKEN_{i}__", token)
+    text = re.sub(r'\s+', ' ', text).strip()
     
     return text

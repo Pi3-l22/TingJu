@@ -91,6 +91,23 @@ class TestTextProcessor(unittest.TestCase):
         self.assertIn("U.S.A.", sentences[0])
         self.assertIn("TLS 1.3", sentences[0])
         self.assertIn("https://example.com/docs.", sentences[1])
+
+    def test_get_sentences_with_quoted_speech(self):
+        """回归测试：引号内句号不应把结尾引号拆成独立句子"""
+        text = 'Someone said, "This is a nice day." Then everyone agreed.'
+        sentences = get_sentences(text, 'english')
+
+        self.assertEqual(len(sentences), 2)
+        self.assertEqual(sentences[0], 'Someone said, "This is a nice day."')
+        self.assertEqual(sentences[1], 'Then everyone agreed.')
+
+    def test_get_sentences_with_terminal_quote_only(self):
+        """回归测试：整句以引号结尾时仍应保持为单句"""
+        text = 'Someone said, "This is a nice day."'
+        sentences = get_sentences(text, 'english')
+
+        self.assertEqual(len(sentences), 1)
+        self.assertEqual(sentences[0], 'Someone said, "This is a nice day."')
         
 
 if __name__ == '__main__':
