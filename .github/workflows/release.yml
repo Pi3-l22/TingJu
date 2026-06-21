@@ -149,33 +149,22 @@ jobs:
             - name: Display structure of downloaded files
               run: ls -R artifacts
 
-            - name: Generate changelog from git history
-              run: |
-                  # Get the previous tag for changelog range
-                  PREV_TAG=$(git tag --sort=-v:refname | grep -v "${{ github.ref_name }}" | head -1)
-                  if [ -z "$PREV_TAG" ]; then
-                    # First release, use all commits
-                    echo "## 更新日志" > CHANGELOG.md
-                    echo "" >> CHANGELOG.md
-                    git log --oneline --no-decorate >> CHANGELOG.md
-                  else
-                    echo "## 更新日志" > CHANGELOG.md
-                    echo "" >> CHANGELOG.md
-                    echo "自 $PREV_TAG 以来的变更:" >> CHANGELOG.md
-                    echo "" >> CHANGELOG.md
-                    git log --oneline --no-decorate "$PREV_TAG..HEAD" >> CHANGELOG.md
-                  fi
-                  echo "Generated changelog:"
-                  cat CHANGELOG.md
-
             - name: Generate release notes
               run: |
-                  TEMPLATE=$(< .github/release_template.md)
-                  NOTES="${TEMPLATE//\$\{\{ VERSION \}\}/${{ github.ref_name }}}"
-                  # Insert changelog into the notes (replaces placeholder or appends)
-                  CHANGELOG=$(cat CHANGELOG.md)
-                  NOTES="${NOTES//\$\{\{ CHANGELOG \}\}/$CHANGELOG}"
-                  echo "$NOTES" > RELEASE.md
+                  # Get the previous tag for changelog compare link
+                  PREV_TAG=$(git tag --sort=-v:refname | grep -v "${{ github.ref_name }}" | head -1)
+                  if [ -n "$PREV_TAG" ]; then
+                    CHANGELOG_LINK="[Full Changelog](https://github.com/Pi3-l22/TingJu/compare/${PREV_TAG}...${{ github.ref_name }})"
+                  else
+                    CHANGELOG_LINK="初始版本发布"
+                  fi
+
+                  # Read template and replace placeholders
+                  cp .github/release_template.md RELEASE.md
+                  sed -i "s|\${{ VERSION }}|${{ github.ref_name }}|g" RELEASE.md
+                  sed -i "s|{{ CHANGELOG }}|${CHANGELOG_LINK}|g" RELEASE.md
+                  echo "Generated release notes:"
+                  cat RELEASE.md
 
             - name: Create release and upload assets
               uses: softprops/action-gh-release@v2
