@@ -76,13 +76,12 @@ async def read_root(request: Request):
     TEMP_FILE_PATH = None
     CURRENT_UUID = ""
     
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request, "index.html")
 
 @app.get("/manual", response_class=HTMLResponse)
 async def manual_input(request: Request):
     """手动填写文本内容"""
-    return templates.TemplateResponse("text.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "text.html", {
         "text": ""  # 空文本，让用户自行填写
     })
 
@@ -110,8 +109,7 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
     try:
         extracted_text = extract_text_from_file(str(temp_file_path))
         if not extracted_text:
-            return templates.TemplateResponse("text.html", {
-                "request": request,
+            return templates.TemplateResponse(request, "text.html", {
                 "error": "无法从文件中提取文本，请确保文件格式正确且包含文本内容，再重新上传或手动填写",
                 "text": ""
             })
@@ -127,8 +125,7 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
         TEMP_FILE_PATH = temp_file_path
         
         # 跳转到文本确认页面
-        return templates.TemplateResponse("text.html", {
-            "request": request,
+        return templates.TemplateResponse(request, "text.html", {
             "text": extracted_text,
             "detect_error": detect_error,
             "detect_name": str(detect_name).capitalize(),
@@ -136,8 +133,7 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
         })
     except Exception as e:
         logger.error(f"处理文件 {file.filename} 时出错: {str(e)}")
-        return templates.TemplateResponse("text.html", {
-            "request": request,
+        return templates.TemplateResponse(request, "text.html", {
             "error": f"处理文件时出错，请使用手动填写: {str(e)}",
             "text": ""
         })
@@ -152,8 +148,7 @@ async def generate(request: Request, text: str = Form(""), voice: str = Form("")
         sentences = get_sentences(paragraph=text, lang=LANGUAGE_CODES.get(lang, "english"))
         
         if not sentences:
-            return templates.TemplateResponse("text.html", {
-                "request": request,
+            return templates.TemplateResponse(request, "text.html", {
                 "text": text,
                 "error": "未能从文本中分割出句子，请仔细检查文本内容"
             })
@@ -194,20 +189,17 @@ async def generate(request: Request, text: str = Form(""), voice: str = Form("")
         
         # 返回结果页面
         if warning_msg:
-            return templates.TemplateResponse("results.html", {
-                "request": request,
+            return templates.TemplateResponse(request, "results.html", {
                 "results": results,
                 "warning": warning_msg
             })
-        return templates.TemplateResponse("results.html", {
-            "request": request,
+        return templates.TemplateResponse(request, "results.html", {
             "results": results
         })
         
     except Exception as e:
         logger.error(f"生成过程中发生错误: {str(e)}")
-        return templates.TemplateResponse("text.html", {
-            "request": request,
+        return templates.TemplateResponse(request, "text.html", {
             "text": text,
             "error": f"生成过程中发生错误: {str(e)}"
         })
@@ -295,7 +287,9 @@ def save_html(title: str, data: Dict[str, List[Dict[str, str]]]):
     try:
         import jinja2
         # 读取模板文件
-        template = jinja2.Template(open("templates/export_template.html", encoding="utf-8").read())
+        with open("templates/export_template.html", encoding="utf-8") as f:
+            template_content = f.read()
+        template = jinja2.Template(template_content)
         html_content = template.render(**data)
         # 保存HTML文件到temp目录
         html_file_path = Path(TEMP_DIR) / f"{title}.html"
