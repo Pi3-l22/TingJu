@@ -161,7 +161,7 @@ jobs:
 
                   # Read template and replace placeholders
                   cp .github/release_template.md RELEASE.md
-                  sed -i "s|\${{ VERSION }}|${{ github.ref_name }}|g" RELEASE.md
+                  sed -i "s|__VERSION__|${{ github.ref_name }}|g" RELEASE.md
                   sed -i "s|{{ CHANGELOG }}|${CHANGELOG_LINK}|g" RELEASE.md
                   echo "Generated release notes:"
                   cat RELEASE.md

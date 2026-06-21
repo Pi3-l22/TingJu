@@ -6,9 +6,9 @@
 
 | 平台    | 文件名                                                                                                                                    |
 | ------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Windows | [TingJu-${{ VERSION }}-windows.zip](https://github.com/Pi3-l22/TingJu/releases/download/${{ VERSION }}/TingJu-${{ VERSION }}-windows.zip) |
-| Linux   | [TingJu-${{ VERSION }}-linux.zip](https://github.com/Pi3-l22/TingJu/releases/download/${{ VERSION }}/TingJu-${{ VERSION }}-linux.zip)     |
-| macOS   | [TingJu-${{ VERSION }}-macos.dmg](https://github.com/Pi3-l22/TingJu/releases/download/${{ VERSION }}/TingJu-${{ VERSION }}-macos.dmg)     |
+| Windows | [TingJu-__VERSION__-windows.zip](https://github.com/Pi3-l22/TingJu/releases/download/__VERSION__/TingJu-__VERSION__-windows.zip) |
+| Linux   | [TingJu-__VERSION__-linux.zip](https://github.com/Pi3-l22/TingJu/releases/download/__VERSION__/TingJu-__VERSION__-linux.zip)     |
+| macOS   | [TingJu-__VERSION__-macos.dmg](https://github.com/Pi3-l22/TingJu/releases/download/__VERSION__/TingJu-__VERSION__-macos.dmg)     |
 
 👉 国内下载地址: [蓝奏云 - TingJu-v1](https://pi3.lanzouo.com/b0kob9yze) | 密码:51122
 
