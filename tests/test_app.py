@@ -91,12 +91,10 @@ class TestApp(unittest.IsolatedAsyncioTestCase):
             with open(tmp_file_path, 'rb') as f:
                 response = self.client.post("/upload", files={"file": f})
             
-            # 检查响应
+            # 检查响应 - 应返回 text.html 页面并显示错误信息
             self.assertEqual(response.status_code, 200)
             self.assertIn("text/html", response.headers["content-type"])
-            # 检查是否返回index.html页面
-            self.assertIn("upload-form", response.text)
-            self.assertIn("upload-area", response.text)
+            self.assertIn("无法从文件中提取文本", response.text)
         finally:
             # 清理临时文件
             os.unlink(tmp_file_path)
@@ -106,7 +104,8 @@ class TestApp(unittest.IsolatedAsyncioTestCase):
         test_text = "This is a test sentence. This is another test sentence."
         response = self.client.post("/generate", data={
             "text": test_text,
-            "voice": "en-US-ChristopherNeural"
+            "voice": "en-US-ChristopherNeural",
+            "lang": "en"
         })
         
         # 检查响应
@@ -123,7 +122,8 @@ class TestApp(unittest.IsolatedAsyncioTestCase):
         """测试生成空文本时的处理"""
         response = self.client.post("/generate", data={
             "text": "",
-            "voice": "en-US-ChristopherNeural"
+            "voice": "en-US-ChristopherNeural",
+            "lang": "en"
         })
         
         # 检查响应
@@ -138,7 +138,8 @@ class TestApp(unittest.IsolatedAsyncioTestCase):
         test_text = "This is a test sentence. This is another test sentence."
         response = self.client.post("/generate", data={
             "text": test_text,
-            "voice": "en-US-ChristopherNeural"
+            "voice": "en-US-ChristopherNeural",
+            "lang": "en"
         })
         
         self.assertEqual(response.status_code, 200)

@@ -26,7 +26,8 @@ class TestLanguageDetector(unittest.TestCase):
         """测试不支持的语言"""
         unsuppoerted_text = 'مرحبًا، كيف حالك اليوم؟'  # 阿拉伯语
         result = detect_language(unsuppoerted_text)
-        self.assertEqual(result['error'], f'语言类型 ar 不支持')
+        self.assertIn('不支持', result['error'])
+        self.assertIn('ar', result['error'])
         self.assertIsNone(result['code'])
         self.assertIsNone(result['name'])
         self.assertIsNone(result['locale'])

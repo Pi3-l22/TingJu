@@ -143,7 +143,7 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
         })
 
 @app.post("/generate")
-async def generate(request: Request, text: str = Form(...), voice: str = Form(...), lang: str = Form(...)):
+async def generate(request: Request, text: str = Form(""), voice: str = Form(""), lang: str = Form("")):
     """
     处理用户确认的文本，进行分句、翻译和音频生成
     """
