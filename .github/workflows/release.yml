@@ -68,7 +68,7 @@ jobs:
             - name: Install 7zip (macOS)
               if: runner.os == 'macOS'
               run: |
-                  brew install p7zip
+                  brew install p7zip create-dmg
 
             - name: Build executable with PyInstaller
               run: |
@@ -83,13 +83,45 @@ jobs:
 
             - name: Make binary executable (Unix)
               if: runner.os != 'Windows'
-              run: chmod +x dist/TingJu
+              run: chmod +x dist/TingJu/TingJu
 
-            - name: Create zip archive with 7zip
+            - name: Ad-hoc sign and create DMG (macOS)
+              if: runner.os == 'macOS'
+              run: |
+                  # Ad-hoc sign the binary and its bundled libraries
+                  # This allows users to right-click → Open to bypass Gatekeeper
+                  codesign --force --deep --sign - dist/TingJu/TingJu
+                  echo "✅ Binary ad-hoc signed"
+
+                  # Create DMG (preserves symlinks, avoids ZIP quarantine issues)
+                  DMG_NAME="TingJu-${{ github.ref_name }}-macos.dmg"
+                  create-dmg \
+                    --volname "TingJu" \
+                    --window-pos 200 120 \
+                    --window-size 600 400 \
+                    --icon-size 100 \
+                    --icon "TingJu" 175 190 \
+                    --app-drop-link 425 190 \
+                    --no-internet-enable \
+                    "$DMG_NAME" \
+                    dist/TingJu/
+                  echo "✅ DMG created: $DMG_NAME"
+
+            - name: Create zip archive (Windows/Linux)
+              if: runner.os != 'macOS'
               run: |
                   7z a -tzip -mx=9 "TingJu-${{ github.ref_name }}-${{ matrix.asset-suffix }}.zip" ./dist/TingJu/*
 
-            - name: Upload artifact
+            - name: Upload artifact (macOS DMG)
+              if: runner.os == 'macOS'
+              uses: actions/upload-artifact@v4
+              with:
+                  name: TingJu-${{ github.ref_name }}-macos
+                  path: TingJu-${{ github.ref_name }}-macos.dmg
+                  if-no-files-found: error
+
+            - name: Upload artifact (Windows/Linux ZIP)
+              if: runner.os != 'macOS'
               uses: actions/upload-artifact@v4
               with:
                   name: TingJu-${{ github.ref_name }}-${{ matrix.asset-suffix }}
@@ -105,6 +137,9 @@ jobs:
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  fetch-tags: true
 
             - name: Download all artifacts
               uses: actions/download-artifact@v4
@@ -114,10 +149,32 @@ jobs:
             - name: Display structure of downloaded files
               run: ls -R artifacts
 
+            - name: Generate changelog from git history
+              run: |
+                  # Get the previous tag for changelog range
+                  PREV_TAG=$(git tag --sort=-v:refname | grep -v "${{ github.ref_name }}" | head -1)
+                  if [ -z "$PREV_TAG" ]; then
+                    # First release, use all commits
+                    echo "## 更新日志" > CHANGELOG.md
+                    echo "" >> CHANGELOG.md
+                    git log --oneline --no-decorate >> CHANGELOG.md
+                  else
+                    echo "## 更新日志" > CHANGELOG.md
+                    echo "" >> CHANGELOG.md
+                    echo "自 $PREV_TAG 以来的变更:" >> CHANGELOG.md
+                    echo "" >> CHANGELOG.md
+                    git log --oneline --no-decorate "$PREV_TAG..HEAD" >> CHANGELOG.md
+                  fi
+                  echo "Generated changelog:"
+                  cat CHANGELOG.md
+
             - name: Generate release notes
               run: |
                   TEMPLATE=$(< .github/release_template.md)
                   NOTES="${TEMPLATE//\$\{\{ VERSION \}\}/${{ github.ref_name }}}"
+                  # Insert changelog into the notes (replaces placeholder or appends)
+                  CHANGELOG=$(cat CHANGELOG.md)
+                  NOTES="${NOTES//\$\{\{ CHANGELOG \}\}/$CHANGELOG}"
                   echo "$NOTES" > RELEASE.md
 
             - name: Create release and upload assets
@@ -129,4 +186,5 @@ jobs:
                   draft: false
                   prerelease: false
                   files: |
+                      artifacts/*/*.dmg
                       artifacts/*/*.zip
