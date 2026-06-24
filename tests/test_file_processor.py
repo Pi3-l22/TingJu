@@ -36,6 +36,38 @@ class TestFileProcessor(unittest.TestCase):
         finally:
             # 确保文件被删除
             os.unlink(temp_filename)
+            
+    def test_extract_from_markdown_file(self):
+        """测试 Markdown 文件提取"""
+        markdown_content = """# Test Title
+This is **bold** and *italic* text.
+- List item
+> Quote text
+```code block```
+Normal text after code."""
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False, encoding='utf-8') as temp_file:
+            temp_file.write(markdown_content)
+            temp_file.flush()
+            temp_filename = temp_file.name
+            
+        try:
+            text = extract_text_from_file(temp_filename)
+            
+            # 验证基本功能
+            self.assertGreater(len(text), 0)
+            self.assertIn("Test Title", text)
+            self.assertIn("bold", text)
+            self.assertIn("italic", text)
+            self.assertIn("Normal text after code", text)
+            
+            # 验证格式标记已移除
+            self.assertNotIn("#", text)
+            self.assertNotIn("**", text)
+            self.assertNotIn("```", text)
+            
+        finally:
+            os.unlink(temp_filename)
 
 if __name__ == '__main__':
     unittest.main()
