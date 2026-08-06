@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pymupdf
 from utils.logger import logger
-from utils.text_processor import normalize_text
 
 FILE_TYPES = ['.pdf', '.txt', '.docx', '.xlsx', '.pptx', '.svg', '.epub', '.mobi', '.xps', '.fb2', '.cbz']
 

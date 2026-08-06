@@ -2,7 +2,7 @@ import unittest
 import time
 import tempfile
 from pathlib import Path
-from utils.text_processor import get_sentences, init_nltk
+from utils.text_processor import get_sentences
 from utils.file_processor import extract_text_from_file
 from utils.text_translator import get_text_translated
 from utils.audio_generator import generate_audio
@@ -27,11 +27,8 @@ class TestPerformance(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls):
-        """测试类初始化，初始化依赖库"""
-        try:
-            init_nltk()
-        except Exception as e:
-            print(f"NLTK 初始化失败: {e}")
+        """sentencex is local and requires no model initialization."""
+        return None
     
     def test_sentence_splitting_performance(self):
         """测试分句性能"""

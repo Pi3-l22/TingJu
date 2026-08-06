@@ -1,114 +1,112 @@
 import unittest
-from utils.text_processor import init_nltk, get_sentences, normalize_text
+
+from utils.text_processor import get_sentences
+
 
 class TestTextProcessor(unittest.TestCase):
-    
-    def test_normalize_text(self):
-        """测试文本预处理"""
-        text = "This   is a  test sentence。Some people may wonder，“How long does it take to form a habit？”This is a another test sentence！"
-        normalized_text = normalize_text(text)
-        self.assertEqual(normalized_text, 'This is a test sentence. Some people may wonder, "How long does it take to form a habit?" This is a another test sentence!')
-
-        # 回归测试：专有缩写和小数不应被错误插入空格
-        edge_text = "by C. Liu, et al., we compare TLS 1.3 in detail."
-        normalized_edge_text = normalize_text(edge_text)
-        self.assertIn("et al.,", normalized_edge_text)
-        self.assertIn("TLS 1.3", normalized_edge_text)
-
-        ja_text = '今日はいい天気だ...でも“急に雨が降り出した!”と彼は叫んだ. 明日の予定は? (キャンプを中止する) みんなで“楽しみにしていた”イベントだったのに…本当に残念ですね。'
-        normalized_text = normalize_text(ja_text, 'japanese')
-        self.assertEqual(normalized_text, '今日はいい天気だ…でも『急に雨が降り出した！』と彼は叫んだ。明日の予定は？（キャンプを中止する）みんなで『楽しみにしていた』イベントだったのに…本当に残念ですね。')
-
-
-    def test_get_sentences(self):
-        """测试句子分割"""
-        init_nltk()
-        text = 'It is often said that we are what we repeatedly do. This simple statement highlights the incredible influence of our daily habits. Habits shape our thoughts, guide our actions, and ultimately determine the kind of life we live. Whether good or bad, habits are powerful forces that quietly direct our future.'
-        sentences = get_sentences(text)
-        self.assertEqual(len(sentences), 4)
-        self.assertEqual(sentences[0], "It is often said that we are what we repeatedly do.")
-        self.assertEqual(sentences[1], "This simple statement highlights the incredible influence of our daily habits.")
-        self.assertEqual(sentences[2], "Habits shape our thoughts, guide our actions, and ultimately determine the kind of life we live.")
-        self.assertEqual(sentences[3], "Whether good or bad, habits are powerful forces that quietly direct our future.")
-
-    def test_large_text(self):
-        """测试大文本分句"""
-        text = ' '.join([f"This is a test sentence {i}." for i in range(100000)])
-        sentences = get_sentences(text)
-        self.assertEqual(len(sentences), 100000)
-        
-    def test_get_sentences_lang(self):
-        """测试不同语言的分句"""
-        init_nltk()
-        texts = {
-            'english': 'This is a test sentence. It has multiple sentences.',
-            'japanese': '今日はいい天気だ...でも「急に雨が降り出した！」と彼は叫んだ。明日の予定は？（キャンプを中止する）みんなで『楽しみにしていた』イベントだったのに…本当に残念ですね。',
-            'korean': '이것은 테스트 문장입니다. 여러 문장이 있습니다.',
-            'french': 'Ceci est une phrase de test. Il y a plusieurs phrases.',
-            'spanish': 'Esta es una oración de prueba. Tiene varias oraciones.',
-            'german': 'Dies ist ein Test-Satz. Es gibt mehrere Sätze.',
-            'italian': 'Questo è un testo. Ha più frasi.',
-            'portuguese': 'Este é um texto de teste. Tem várias frases.',
-            'russian': 'Это тестовая фраза. Имеет несколько предложений.',
-        }
-        for lang, text in texts.items():
-            sentences = get_sentences(text, lang)
-            self.assertEqual(len(sentences), 2)
-
-    def test_get_sentences_with_abbreviation_and_decimal(self):
-        """回归测试：缩写 + 小数场景不应导致误拆分"""
-        init_nltk()
-        text = "This was reported by C. Liu, et al., in TLS 1.3 research. The result is stable."
-        sentences = get_sentences(text, 'english')
-        self.assertEqual(len(sentences), 2)
-        self.assertIn("et al.,", sentences[0])
-        self.assertIn("TLS 1.3", sentences[0])
-
-    def test_normalize_text_special_cases(self):
-        """更多特殊情况：缩写链、版本号、URL、邮箱、数字格式"""
+    def test_basic_english_sentences(self):
         text = (
-            "In the U.S.A.we use v3.10 and TLS 1.3.This is common!"
-            "Contact me at test@example.com,and check https://example.com/docs."
-            "The budget is 1,000.25 at 12:30."
+            "It is often said that we are what we repeatedly do. "
+            "This simple statement highlights the influence of our daily habits. "
+            "Habits shape our thoughts, guide our actions, and determine the kind of life we live. "
+            "Whether good or bad, habits direct our future."
         )
-        normalized = normalize_text(text)
+        self.assertEqual(len(get_sentences(text, "english")), 4)
 
-        self.assertIn("U.S.A.", normalized)
-        self.assertIn("v3.10", normalized)
-        self.assertIn("TLS 1.3", normalized)
-        self.assertIn("test@example.com", normalized)
-        self.assertIn("https://example.com/docs", normalized)
-        self.assertIn("1,000.25", normalized)
-        self.assertIn("12:30", normalized)
-        self.assertIn("This is common! Contact", normalized)
+    def test_supported_languages(self):
+        texts = {
+            "english": "This is a test sentence. It has multiple sentences.",
+            "french": "Ceci est une phrase de test. Il y a plusieurs phrases.",
+            "german": "Dies ist ein Testsatz. Es gibt mehrere Sätze.",
+            "japanese": "今日はいい天気です。明日も晴れるでしょう。",
+            "korean": "오늘은 날씨가 좋습니다. 내일도 맑겠습니다.",
+            "russian": "Привет, мир. Ещё одно предложение.",
+            "spanish": "Esta es una oración de prueba. Tiene varias oraciones.",
+            "portuguese": "Este é um texto de teste. Tem várias frases.",
+            "italian": "Questo è un testo. Ha più frasi.",
+        }
+        for language, text in texts.items():
+            with self.subTest(language=language):
+                self.assertEqual(len(get_sentences(text, language)), 2)
 
-    def test_get_sentences_with_acronym_and_url(self):
-        """回归测试：缩写链与URL不应导致误拆分"""
-        init_nltk()
-        text = "In the U.S.A. we test TLS 1.3. Read more at https://example.com/docs. This is final."
-        sentences = get_sentences(text, 'english')
+    def test_language_codes_are_accepted(self):
+        self.assertEqual(
+            get_sentences("This is one sentence. This is another.", "en"),
+            ["This is one sentence.", "This is another."],
+        )
+
+    def test_multi_sentence_quotation_is_one_learning_unit(self):
+        text = 'Someone said, "This is sentence one. This is sentence two." Then everyone agreed.'
+        self.assertEqual(
+            get_sentences(text, "english"),
+            ['Someone said, "This is sentence one. This is sentence two."', "Then everyone agreed."],
+        )
+
+    def test_single_sentence_quotation_is_preserved(self):
+        text = 'Someone said, "This is a nice day." Then everyone agreed.'
+        self.assertEqual(
+            get_sentences(text, "english"),
+            ['Someone said, "This is a nice day."', "Then everyone agreed."],
+        )
+
+    def test_unicode_quotation_is_preserved(self):
+        text = "She asked, “Really? You did that?” I nodded."
+        self.assertEqual(get_sentences(text, "english"), ["She asked, “Really? You did that?”", "I nodded."])
+
+    def test_japanese_reporting_clause_is_merged(self):
+        text = "彼は「やめて！聞いている？戻って！」と叫んだ。ドアが閉まった。"
+        self.assertEqual(get_sentences(text, "japanese"), ["彼は「やめて！聞いている？戻って！」と叫んだ。", "ドアが閉まった。"])
+
+    def test_korean_reporting_clause_is_merged(self):
+        text = "그는 “멈춰! 듣고 있어? 돌아와!”라고 외쳤다. 문이 닫혔다."
+        self.assertEqual(get_sentences(text, "korean"), ["그는 “멈춰! 듣고 있어? 돌아와!”라고 외쳤다.", "문이 닫혔다."])
+
+    def test_abbreviations_decimals_and_urls(self):
+        text = (
+            "This was reported by C. Liu, et al., in TLS 1.3 research. "
+            "Read more at https://example.com/docs. The result is stable."
+        )
+        sentences = get_sentences(text, "english")
         self.assertEqual(len(sentences), 3)
-        self.assertIn("U.S.A.", sentences[0])
+        self.assertIn("C. Liu, et al.,", sentences[0])
         self.assertIn("TLS 1.3", sentences[0])
         self.assertIn("https://example.com/docs.", sentences[1])
 
-    def test_get_sentences_with_quoted_speech(self):
-        """回归测试：引号内句号不应把结尾引号拆成独立句子"""
-        text = 'Someone said, "This is a nice day." Then everyone agreed.'
-        sentences = get_sentences(text, 'english')
+    def test_original_punctuation_and_spacing_are_not_normalized(self):
+        text = "First。  Second！"
+        sentences = get_sentences(text, "japanese")
+        self.assertEqual(sentences, ["First。", "Second！"])
 
-        self.assertEqual(len(sentences), 2)
-        self.assertEqual(sentences[0], 'Someone said, "This is a nice day."')
-        self.assertEqual(sentences[1], 'Then everyone agreed.')
+    def test_short_lexical_sentences_are_kept(self):
+        self.assertEqual(get_sentences("I. No! Go!", "english"), ["I.", "No!", "Go!"])
 
-    def test_get_sentences_with_terminal_quote_only(self):
-        """回归测试：整句以引号结尾时仍应保持为单句"""
-        text = 'Someone said, "This is a nice day."'
-        sentences = get_sentences(text, 'english')
+    def test_large_text_has_stable_boundaries(self):
+        text = " ".join(f"This is sentence {index}." for index in range(100000))
+        sentences = get_sentences(text, "english")
 
-        self.assertEqual(len(sentences), 1)
-        self.assertEqual(sentences[0], 'Someone said, "This is a nice day."')
-        
+        self.assertEqual(len(sentences), 100000)
+        self.assertEqual(sentences[0], "This is sentence 0.")
+        self.assertEqual(sentences[-1], "This is sentence 99999.")
 
-if __name__ == '__main__':
+    def test_large_text_keeps_quoted_block_feature(self):
+        text = " ".join(
+            'Someone said, "First. Second." Then everyone agreed.' for _ in range(1000)
+        )
+        sentences = get_sentences(text, "english")
+
+        self.assertEqual(len(sentences), 2000)
+        self.assertEqual(sentences[0], 'Someone said, "First. Second."')
+        self.assertEqual(sentences[1], "Then everyone agreed.")
+
+    def test_punctuation_only_fragments_are_ignored(self):
+        self.assertEqual(get_sentences("... !!!", "english"), [])
+
+    def test_empty_text_is_ignored(self):
+        self.assertEqual(get_sentences("   ", "english"), [])
+
+    def test_unknown_language_falls_back_to_english(self):
+        self.assertEqual(get_sentences("First sentence. Second sentence.", "unknown"), ["First sentence.", "Second sentence."])
+
+
+if __name__ == "__main__":
     unittest.main()

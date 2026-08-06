@@ -8,7 +8,7 @@
   </p>
   
   <p align="center">
-    <img src="https://img.shields.io/badge/Python-3.8+-3f72af?style=flat-square&logo=python" alt="Python">
+    <img src="https://img.shields.io/badge/Python-3.10+-3f72af?style=flat-square&logo=python" alt="Python">
     <img src="https://img.shields.io/badge/FastAPI-0.68.0+-609966?style=flat-square&logo=fastapi" alt="FastAPI">
     <img src="https://img.shields.io/github/languages/code-size/Pi3-l22/TingJu?style=flat-square&logo=GitHub&color=ced6e0" alt="FastAPI">
     <img src="https://img.shields.io/github/license/Pi3-l22/TingJu?style=flat-square&color=f6b2ce" alt="License">
@@ -28,7 +28,7 @@
 > 现已支持**英语English**、**日语Japanese**、**韩语Korean**、**法语French**、**德语German**、**俄语Russian**、**西班牙语Spanish**、**葡萄牙语Portuguese**、**意大利语Italian**，共9种语言的听句学习。
 
 核心功能：
-- ✅ **智能分句**：使用NLP自然语言处理技术，根据语义和语法规则进行精准分句
+- ✅ **智能分句**：使用 sentencex 进行轻量多语言分句，保留原文标点与引号
 - ✅ **双语对照**：调用多种翻译引擎（Bing、百度、有道等）生成准确翻译
 - ✅ **标准发音**：使用Microsoft Edge官方英文音色，还原地道英文发音
 - ✅ **句子听写**：支持句子听写功能，隐藏英文与翻译，练习英语听力
@@ -48,9 +48,11 @@
 - 以及其他格式（SVG、EPUB、MOBI、XPS、FB2、CBZ等）
 
 ### ✂️ 智能文本处理
-- 利用NLTK自然语言处理库进行智能分句
-- 自动规范化文本（替换中文标点为英文标点、合并多余空格等）
-- 过滤无意义短句，确保学习内容质量
+- 使用 sentencex 对英语、日语、韩语、法语、德语、俄语、西班牙语、葡萄牙语和意大利语进行本地分句
+- 分句过程不需要下载 NLTK、Punkt 或其他词库
+- 保留原文标点、引号和句内空格
+- 完整引语块默认作为一个学习单元，即使引号内部包含多个句末标点
+- 过滤纯标点片段，同时保留有效短句
 
 ### 🌐 精准翻译
 - 集成多种翻译引擎（Bing、百度、有道等）
@@ -193,7 +195,7 @@ TingJu/
 
 - **后端框架**：[FastAPI](https://fastapi.tiangolo.com/) - 现代、快速（高性能）的Python Web框架
 - **TTS引擎**：[edge-tts](https://github.com/rany2/edge-tts) - Microsoft Edge TTS的Python接口
-- **文本处理**：[NLTK](https://www.nltk.org/) - 自然语言处理工具包
+- **文本处理**：[sentencex](https://github.com/wikimedia/sentencex) - 轻量多语言句子分割库
 - **翻译服务**：[translators](https://pypi.org/project/translators/) - 多平台翻译库
 - **文档处理**：[PyMuPDF](https://pymupdf.readthedocs.io/) - PDF和文档处理库
 - **模板引擎**：[Jinja2](https://jinja.palletsprojects.com/) - 现代和设计友好的Python模板引擎

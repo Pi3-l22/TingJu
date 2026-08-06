@@ -13,7 +13,6 @@ venv/
 *.exe
 
 # Data files
-nltk_data/
 audios/
 logs/
 *.log

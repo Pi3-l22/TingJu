@@ -35,10 +35,6 @@ jobs:
                   python -m pip install --upgrade pip
                   pip install -r requirements.txt pyinstaller==6.21.0
 
-            - name: Bundle NLTK tokenizer data
-              run: |
-                  python scripts/download_nltk_data.py
-
             # UPX-compressed native modules are more likely to be quarantined
             # or delayed by Windows Defender. Keep the release uncompressed.
 
@@ -72,13 +68,12 @@ jobs:
 
             - name: Build executable with PyInstaller
               run: |
-                  pyinstaller --name TingJu --onedir --noupx --icon "${{ github.workspace }}/static/img/icon.ico" --hidden-import translators --hidden-import translators.server --distpath ./dist --workpath ./build --specpath ./spec launcher.py
+                  pyinstaller --name TingJu --onedir --noupx --icon "${{ github.workspace }}/static/img/icon.ico" --hidden-import translators --hidden-import translators.server --collect-binaries sentencex --distpath ./dist --workpath ./build --specpath ./spec launcher.py
 
             - name: Copy extra directories and files
               shell: bash
               run: |
                   cp -r static templates dist/TingJu
-                  [ -d nltk_data ] && cp -r nltk_data dist/TingJu || true
                   [ -f README.md ] && cp README.md dist/TingJu/ || true
                   [ -f LICENSE ] && cp LICENSE dist/TingJu/ || true
 

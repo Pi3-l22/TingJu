@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from utils.file_processor import extract_text_from_file
-from utils.text_processor import init_nltk, get_sentences
+from utils.text_processor import get_sentences
 from utils.text_translator import get_text_translated
 from utils.audio_generator import generate_audio, list_voices, AUDIO_DIR
 from utils.language_detector import detect_language, LANGUAGE_CODES, LANGUAGE_NAMES, TTS_LOCALES
@@ -381,9 +381,7 @@ def run(host: str = "0.0.0.0", port: int | None = None) -> int:
     print(f"Local URL: {url}", flush=True)
     print(f"Log directory: {DATA_DIR / 'logs'}", flush=True)
 
-    # NLTK is initialized lazily by sentence splitting.  A first-run download
-    # must never prevent the local web service from becoming ready.
-    logger.info("服务准备启动，NLTK 将在需要时初始化")
+    logger.info("服务准备启动，sentencex 将在本地执行分句")
 
     import socket
     probe_host = "0.0.0.0" if host == "0.0.0.0" else host

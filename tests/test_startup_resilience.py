@@ -32,10 +32,10 @@ class TestStartupResilience(unittest.TestCase):
         self.assertEqual(resource_path("static"), APP_DIR / "static")
         self.assertTrue(resource_path("templates").is_dir())
 
-    def test_nltk_uses_bundled_data_when_available(self):
-        from utils.text_processor import BUNDLED_DATA_DIR
+    def test_sentencex_is_local_and_available(self):
+        import sentencex
 
-        self.assertTrue(Path(BUNDLED_DATA_DIR).is_dir())
+        self.assertEqual(list(sentencex.segment("en", "One sentence.")), ["One sentence."])
 
 
 if __name__ == "__main__":
