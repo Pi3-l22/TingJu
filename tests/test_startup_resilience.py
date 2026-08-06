@@ -24,7 +24,9 @@ class TestStartupResilience(unittest.TestCase):
         from utils.text_translator import get_text_translated
 
         with patch("utils.text_translator._load_translators", return_value=None):
-            self.assertEqual(get_text_translated(["one", "two"]), ["one", "two"])
+            translations, warning = get_text_translated(["one", "two"])
+            self.assertEqual(translations, ["one", "two"])
+            self.assertIn("翻译引擎不可用", warning)
 
     def test_resources_are_independent_of_current_directory(self):
         from utils.runtime import APP_DIR, resource_path

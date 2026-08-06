@@ -1,7 +1,9 @@
 import unittest
+import asyncio
 import time
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 from utils.text_processor import get_sentences
 from utils.file_processor import extract_text_from_file
 from utils.text_translator import get_text_translated
@@ -79,12 +81,21 @@ class TestPerformance(unittest.TestCase):
     
     def test_translation_performance(self):
         """测试翻译性能"""
+        class FakeTranslators:
+            @staticmethod
+            def translate_text(text, **kwargs):
+                return "翻译结果"
+
         start_time = time.time()
-        translations = get_text_translated(SENTENCES)
+        with patch("utils.text_translator._load_translators", return_value=FakeTranslators), patch(
+            "utils.text_translator._translation_disabled", False
+        ):
+            translations, warning = get_text_translated(SENTENCES)
         end_time = time.time()
         
         # 检查结果
         self.assertEqual(len(translations), len(SENTENCES))
+        self.assertEqual(warning, "")
         
         # 检查性能 - 翻译可能较慢，但应该在30秒内完成
         execution_time = end_time - start_time
@@ -92,15 +103,35 @@ class TestPerformance(unittest.TestCase):
         
         print(f"对 {len(SENTENCES)} 个句子进行翻译的耗时为: {execution_time:.4f} 秒")
     
-    async def test_audio_generation_performance(self):
+    def test_audio_generation_performance(self):
         """测试音频生成性能"""
+        class FakeCommunicate:
+            def __init__(self, text, voice):
+                self.text = text
+
+            async def save(self, path):
+                Path(path).write_bytes(b"\xff\xf3\x64\xc4")
+
         start_time = time.time()
-        audio_dir, audio_filenames, _ = await generate_audio(SENTENCES[:5], "en-US-ChristopherNeural", "performance_test")  # 只测试前5个句子
+        with tempfile.TemporaryDirectory() as temp_dir, patch(
+            "utils.audio_generator.AUDIO_DIR", Path(temp_dir) / "audios"
+        ), patch("utils.audio_generator.edge_tts.Communicate", FakeCommunicate):
+            audio_dir, audio_filenames, warning = asyncio.run(
+                generate_audio(
+                    SENTENCES[:5], "en-US-ChristopherNeural", "performance_test"
+                )
+            )
+            files_exist = all(
+                filename is not None and Path(audio_dir, filename).exists()
+                for filename in audio_filenames
+            )
         end_time = time.time()
         
         # 检查结果
         self.assertEqual(len(audio_filenames), 5)
-        self.assertTrue(all([Path(audio_dir, filename).exists() for filename in audio_filenames]))
+        self.assertEqual(warning, "")
+        self.assertTrue(all(filename is not None for filename in audio_filenames))
+        self.assertTrue(files_exist)
         
         # 检查性能
         execution_time = end_time - start_time
@@ -108,14 +139,6 @@ class TestPerformance(unittest.TestCase):
         
         print(f"对 {len(SENTENCES[:5])} 个句子生成音频的耗时为 {execution_time:.4f} 秒")
         
-        # 清理生成的音频文件
-        try:
-            import shutil
-            if audio_dir.exists():
-                shutil.rmtree(audio_dir)
-        except Exception as e:
-            print(f"清理音频文件时出错: {e}")
-            
     def test_detect_language_performance(self):
         """测试语言检测性能"""
         text_list = [

@@ -17,16 +17,63 @@ class TestTextTranslator(unittest.TestCase):
         class FakeTranslators:
             @staticmethod
             def translate_text(text, **kwargs):
-                return "translated"
+                return "翻译结果"
 
         with patch("utils.text_translator._load_translators", return_value=FakeTranslators), patch(
             "utils.text_translator._translation_disabled", False
         ):
-            translated_text = get_text_translated(text_list)
+            translated_text, warning = get_text_translated(text_list)
 
         self.assertEqual(len(translated_text), len(text_list))
+        self.assertEqual(warning, "")
         for original, translated in zip(text_list, translated_text):
             self.assertNotIn(original, translated)
+
+    def test_invalid_sogou_style_response_switches_provider(self):
+        text_list = [f"This is test sentence number {i}." for i in range(33)]
+        calls = []
+
+        class FakeTranslators:
+            @staticmethod
+            def translate_text(text, **kwargs):
+                provider = kwargs["translator"]
+                calls.append(provider)
+                if provider == "youdao" and calls.count("youdao") <= 19:
+                    return "有效翻译"
+                if provider == "youdao":
+                    return "x98tog3p6vtfq7yz8soj"
+                if provider == "alibaba":
+                    return "阿里翻译"
+                raise AssertionError(f"unexpected provider {provider}")
+
+        with patch("utils.text_translator._load_translators", return_value=FakeTranslators), patch(
+            "utils.text_translator._translation_disabled", False
+        ):
+            translated_text, warning = get_text_translated(text_list)
+
+        self.assertEqual(len(translated_text), 33)
+        self.assertEqual(warning, "")
+        self.assertNotIn("x98tog3p6vtfq7yz8soj", translated_text)
+        self.assertEqual(translated_text[:19], ["有效翻译"] * 19)
+        self.assertEqual(translated_text[19:], ["阿里翻译"] * 14)
+        self.assertEqual(calls.count("youdao"), 20)
+        self.assertEqual(calls.count("alibaba"), 14)
+
+    def test_all_providers_failed_preserves_original_and_warns(self):
+        text_list = ["A complete English sentence for testing.", "Another complete sentence."]
+
+        class FakeTranslators:
+            @staticmethod
+            def translate_text(text, **kwargs):
+                raise RuntimeError("offline")
+
+        with patch("utils.text_translator._load_translators", return_value=FakeTranslators), patch(
+            "utils.text_translator._translation_disabled", False
+        ):
+            translated_text, warning = get_text_translated(text_list)
+
+        self.assertEqual(translated_text, text_list)
+        self.assertIn("第 1,2 句翻译失败", warning)
 
     def test_all_translators(self):
         if os.environ.get("TINGJU_RUN_NETWORK_TESTS") != "1":

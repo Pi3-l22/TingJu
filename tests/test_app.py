@@ -2,10 +2,13 @@ import unittest
 import tempfile
 import os
 import shutil
+import re
 from pathlib import Path
 from fastapi.testclient import TestClient
+from unittest.mock import AsyncMock, patch
 
 from app import app, TEMP_DIR, EXPORT_DIR, AUDIO_DIR, cleanup_temp_files
+from utils.audio_generator import _get_filename
 
 class TestApp(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
@@ -48,7 +51,10 @@ class TestApp(unittest.IsolatedAsyncioTestCase):
 
     async def test_get_voices(self):
         """测试获取音色列表"""
-        response = self.client.get("/voices")
+        with patch("app.list_voices", new=AsyncMock(return_value=[
+            {"name": "en-US-TestNeural", "gender": "Female", "style": []}
+        ])):
+            response = self.client.get("/voices")
         self.assertEqual(response.status_code, 200)
         data = response.json()
         # 检查返回数据是否包含voices键
@@ -102,11 +108,25 @@ class TestApp(unittest.IsolatedAsyncioTestCase):
     async def test_generate(self):
         """测试生成音频和翻译功能"""
         test_text = "This is a test sentence. This is another test sentence."
-        response = self.client.post("/generate", data={
-            "text": test_text,
-            "voice": "en-US-ChristopherNeural",
-            "lang": "en"
-        })
+
+        async def fake_generate_audio(sentences, voice_name, title):
+            audio_dir = Path(AUDIO_DIR) / title
+            audio_dir.mkdir(parents=True, exist_ok=True)
+            filenames = []
+            for index, sentence in enumerate(sentences, start=1):
+                filename = f"{index}_{_get_filename(sentence)}"
+                (audio_dir / filename).write_bytes(b"\xff\xf3\x64\xc4")
+                filenames.append(filename)
+            return audio_dir, filenames, ""
+
+        with patch("app.get_text_translated", return_value=(
+            ["这是测试句子。", "这是另一个测试句子。"], ""
+        )), patch("app.generate_audio", new=fake_generate_audio):
+            response = self.client.post("/generate", data={
+                "text": test_text,
+                "voice": "en-US-ChristopherNeural",
+                "lang": "en"
+            })
         
         # 检查响应
         self.assertEqual(response.status_code, 200)
@@ -117,6 +137,14 @@ class TestApp(unittest.IsolatedAsyncioTestCase):
         # 检查结果中是否包含句子和翻译
         self.assertIn("This is a test sentence.", response.text)
         self.assertIn("This is another test sentence.", response.text)
+
+        audio_urls = re.findall(r'<source src="([^"]+)"', response.text)
+        self.assertEqual(len(audio_urls), 2)
+        for audio_url in audio_urls:
+            self.assertTrue(audio_url.startswith("/audios/"))
+            audio_response = self.client.get(audio_url)
+            self.assertEqual(audio_response.status_code, 200)
+            self.assertTrue(audio_response.content.startswith(b"\xff\xf3"))
 
     async def test_generate_empty_text(self):
         """测试生成空文本时的处理"""
@@ -136,11 +164,24 @@ class TestApp(unittest.IsolatedAsyncioTestCase):
         """测试导出功能"""
         # 先生成一些内容，设置CURRENT_UUID
         test_text = "This is a test sentence. This is another test sentence."
-        response = self.client.post("/generate", data={
-            "text": test_text,
-            "voice": "en-US-ChristopherNeural",
-            "lang": "en"
-        })
+        async def fake_generate_audio(sentences, voice_name, title):
+            audio_dir = Path(AUDIO_DIR) / title
+            audio_dir.mkdir(parents=True, exist_ok=True)
+            filenames = []
+            for index, sentence in enumerate(sentences, start=1):
+                filename = f"{index}_{_get_filename(sentence)}"
+                (audio_dir / filename).write_bytes(b"\xff\xf3\x64\xc4")
+                filenames.append(filename)
+            return audio_dir, filenames, ""
+
+        with patch("app.get_text_translated", return_value=(
+            ["这是测试句子。", "这是另一个测试句子。"], ""
+        )), patch("app.generate_audio", new=fake_generate_audio):
+            response = self.client.post("/generate", data={
+                "text": test_text,
+                "voice": "en-US-ChristopherNeural",
+                "lang": "en"
+            })
         
         self.assertEqual(response.status_code, 200)
         
@@ -164,7 +205,11 @@ class TestApp(unittest.IsolatedAsyncioTestCase):
         self.assertTrue((export_path / "css").exists())
         self.assertTrue((export_path / "js").exists())
         self.assertTrue((export_path / "img").exists())
-        self.assertTrue((export_path / AUDIO_DIR).exists())
+        audios_path = export_path / Path(AUDIO_DIR).name
+        self.assertTrue(audios_path.exists())
+        exported_html = (export_path / "index.html").read_text(encoding="utf-8")
+        self.assertIn("./audios/", exported_html)
+        self.assertNotIn("D:/", exported_html)
 
 if __name__ == "__main__":
     unittest.main()

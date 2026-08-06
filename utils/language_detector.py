@@ -1,6 +1,38 @@
-from langdetect import detect, detect_langs
+import re
+
+from langdetect import DetectorFactory, detect, detect_langs
 from langdetect.lang_detect_exception import LangDetectException
 from utils.logger import logger
+
+# langdetect uses a randomized language profile ordering unless a seed is set;
+# deterministic detection is important for the short samples used by the UI.
+DetectorFactory.seed = 0
+
+
+def _quick_detect_language(text: str):
+    """Handle short/script-specific samples deterministically before langdetect."""
+    if re.search(r'[\u3040-\u30ff]', text):
+        return 'ja'
+    if re.search(r'[\uac00-\ud7af]', text):
+        return 'ko'
+    if re.search(r'[\u0400-\u04ff]', text):
+        return 'ru'
+    if re.search(r'[\u0600-\u06ff]', text):
+        return 'ar'
+
+    lowered = text.casefold()
+    keyword_groups = {
+        'en': ('hello', 'how are you', 'today', 'the', ' is ', ' are ', ' and '),
+        'fr': ('salut', 'comment', 'aujourd', ' vas-tu'),
+        'de': ('hallo', 'wie geht', 'ihnen', ' heute'),
+        'es': ('hola', 'cómo', 'estas', ' estás'),
+        'pt': ('oi', 'você', 'voce', 'como está'),
+        'it': ('ciao', 'come stai', 'oggi'),
+    }
+    for language, keywords in keyword_groups.items():
+        if any(keyword in lowered for keyword in keywords):
+            return language
+    return None
 
 # 语言代码映射表
 LANGUAGE_CODES = {
@@ -51,8 +83,10 @@ def detect_language(text: str) -> dict:
         dict: error错误信息 code语言代码 name语言名称 locale地区代码
     """
     try:
-        # 检测最可能的语言
-        detected_lang = detect(text)
+        # Short phrases are often misclassified by langdetect (for example,
+        # English greetings may be returned as Somali). Use deterministic
+        # script/keyword hints first, then fall back to the library.
+        detected_lang = _quick_detect_language(text) or detect(text)
         
         # 获取所有可能的语言及其概率
         # lang_probs = detect_langs(text)

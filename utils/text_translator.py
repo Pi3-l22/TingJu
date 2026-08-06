@@ -1,12 +1,24 @@
-from typing import List
 import os
+import re
 from threading import Lock
+from typing import List, Tuple
+
 from utils.logger import logger
 
 # 翻译器列表
-TRANSLATORS = ['bing', 'sogou', 'youdao', 'alibaba', 'hujiang', 'iflyrec', 'caiyun', 'itranslate', 'lingvanex', 'translateCom', 'yandex']
-# alibaba apertium bing caiyun google hujiang iflyrec itranslate languageWire lingvanex modernMt myMemory qqTranSmart reverso sogou sysTran translateCom utibet yandex youdao
-# alibaba apertium bing hujiang iflyrec itranslate languageWire lingvanex qqTranSmart sogou sysTran translateCom utibet yandex youdao
+# Keep the no-key providers that currently support English-to-Chinese text.
+# Bing and Sogou are intentionally excluded: Bing's HTML parser is broken in
+# the current translators release and Sogou starts returning anti-abuse tokens
+# after a small number of requests.
+TRANSLATORS = [
+    'youdao',
+    'alibaba',
+    'iflyrec',
+    'caiyun',
+    'itranslate',
+    'lingvanex',
+    'translateCom',
+]
 
 # 默认超时时间
 DEFAULT_TIMEOUT = 5.0
@@ -71,7 +83,45 @@ def init_translators():
             _translation_disabled = True
             logger.warning("翻译引擎测速失败，将保留原文: %s", error)
 
-def get_text_translated(text_list: List[str], from_lang: str = 'en', to_lang: str = 'zh') -> List[str]:
+def _is_valid_translation(value: object, source: str, to_lang: str) -> bool:
+    """Reject successful HTTP responses that are not actual translations."""
+    if not isinstance(value, str):
+        return False
+
+    translated = value.strip()
+    if not translated:
+        return False
+
+    lowered = translated.lower()
+    if (
+        translated.startswith('<')
+        or translated.startswith('{')
+        or 'captcha' in lowered
+        or 'verify' in lowered
+        or 'access denied' in lowered
+    ):
+        return False
+
+    # Sogou's anti-abuse response is a compact lower-case alpha-numeric token.
+    if re.fullmatch(r'[a-z0-9]{16,64}', translated):
+        return False
+
+    source_words = re.findall(r'[A-Za-z]+', source)
+    if to_lang.lower().startswith('zh') and len(source_words) >= 2 and len(source) >= 12:
+        # A full English sentence translated to Chinese should contain at least
+        # one Han character. This catches unchanged/error responses while still
+        # allowing short proper nouns and numeric-only input.
+        if not re.search(r'[\u3400-\u9fff]', translated):
+            return False
+        if translated.casefold() == source.strip().casefold():
+            return False
+
+    return True
+
+
+def get_text_translated(
+    text_list: List[str], from_lang: str = 'en', to_lang: str = 'zh'
+) -> Tuple[List[str], str]:
     """
     获取文本的翻译, 失败时尝试其他翻译器
     
@@ -81,50 +131,88 @@ def get_text_translated(text_list: List[str], from_lang: str = 'en', to_lang: st
         to_lang (str, optional): 目标语言。默认为 'zh'。
 
     Returns:
-        List[str]: 翻译后的文本列表
+        Tuple[List[str], str]: 对齐的翻译列表和警告信息
     """
     logger.info(f"正在翻译 {len(text_list)} 条文本...")
     global _translation_disabled
     ts = _load_translators()
     if ts is None:
-        return list(text_list)
+        return list(text_list), "翻译引擎不可用，已保留原文"
     if _translation_disabled:
-        return list(text_list)
+        return list(text_list), "翻译网络不可用，已保留原文"
 
     translated_text = []
+    failed_numbers = []
+    disabled_translators = set()
+    preferred_translator = None
+    provider_successes = {translator: 0 for translator in TRANSLATORS}
     success_count = 0
-    for index, text in enumerate(text_list):
-        if _translation_disabled:
-            translated_text.extend(text_list[index:])
-            break
+    for index, text in enumerate(text_list, start=1):
         translated = None
-        # 尝试使用所有翻译器
-        for translator in TRANSLATORS:
+        order = []
+        if preferred_translator and preferred_translator not in disabled_translators:
+            order.append(preferred_translator)
+        order.extend(
+            translator for translator in TRANSLATORS
+            if translator not in disabled_translators and translator not in order
+        )
+
+        for translator in order:
             try:
-                translated = ts.translate_text(
+                candidate = ts.translate_text(
                     text,
                     from_language=from_lang,
                     to_language=to_lang,
                     translator=translator,
                     timeout=DEFAULT_TIMEOUT
                 )
+                if not _is_valid_translation(candidate, text, to_lang):
+                    disabled_translators.add(translator)
+                    logger.warning(
+                        "翻译引擎 %s 返回无效结果，当前批次已熔断（第 %s 句）",
+                        translator,
+                        index,
+                    )
+                    continue
+                translated = candidate.strip()
+                preferred_translator = translator
+                provider_successes[translator] += 1
                 success_count += 1
-                break  # 成功就跳出循环
+                break
             except Exception as e:
-                logger.warning(f"使用 {translator} 翻译 {text} 时失败，原因: {e}")
-                if _is_network_failure(e):
-                    _translation_disabled = True
-                    logger.warning("翻译网络不可用，本次及后续请求将保留原文")
-                    break
+                disabled_translators.add(translator)
+                logger.warning(
+                    "翻译引擎 %s 失败（第 %s 句），当前批次已熔断：%s",
+                    translator,
+                    index,
+                    e,
+                )
                 continue
-        
+
         if translated is not None:
             translated_text.append(translated)
-        elif _translation_disabled:
-            translated_text.append(text)
         else:
-            logger.error(f"{text[:20]}... 翻译失败")
-            translated_text.append(text + " 翻译失败")
+            translated_text.append(text)
+            failed_numbers.append(index)
+            logger.error("第 %s 句翻译失败，已保留原文", index)
 
-    logger.info(f"共 {success_count}/{len(translated_text)} 条文本翻译完成")
-    return translated_text
+    warning_msg = ""
+    if failed_numbers:
+        warning_msg = (
+            f"第 {','.join(map(str, failed_numbers))} 句翻译失败，已保留原文；"
+            "请检查网络或稍后重试"
+        )
+
+    used_summary = ', '.join(
+        f"{translator}:{count}"
+        for translator, count in provider_successes.items()
+        if count
+    ) or 'none'
+    logger.info(
+        "翻译完成：%s/%s 成功，失败句号=%s，使用引擎=%s",
+        success_count,
+        len(translated_text),
+        ','.join(map(str, failed_numbers)) or 'none',
+        used_summary,
+    )
+    return translated_text, warning_msg

@@ -166,20 +166,27 @@ async def generate(request: Request, text: str = Form(""), voice: str = Form("")
         
         # 翻译句子
         lang_code = lang if lang in LANGUAGE_CODES else "en"
-        translated_sentences = get_text_translated(sentences, from_lang=lang_code)
+        translated_sentences, translation_warning = get_text_translated(
+            sentences, from_lang=lang_code
+        )
         
         # 生成音频
         voice_name = voice if voice else "en-US-ChristopherNeural"
         audio_dir, audio_filenames, warning_msg = await generate_audio(sentences, voice_name, title)
         
-        # 构建结果列表
+        # 构建结果列表。结果中只保存可被 HTTP/导出页面使用的逻辑路径，
+        # 绝不把本机磁盘绝对路径暴露给浏览器。
         results = []
         for i, (sentence, translation, audio_filename) in enumerate(zip(sentences, translated_sentences, audio_filenames)):
-            audio_path = Path(audio_dir) / audio_filename
+            audio_path = None
+            if audio_filename:
+                audio_path = "/".join(
+                    (Path(AUDIO_DIR).name, title, audio_filename)
+                )
             results.append({
                 "sentence": sentence,
                 "translation": translation,
-                "audio_path": str(audio_path).replace("\\", "/")  # 确保路径分隔符统一
+                "audio_path": audio_path,
             })
         
         # 清理临时文件
@@ -196,13 +203,10 @@ async def generate(request: Request, text: str = Form(""), voice: str = Form("")
         CURRENT_UUID = title
         
         # 返回结果页面
-        if warning_msg:
-            return templates.TemplateResponse(request, "results.html", {
-                "results": results,
-                "warning": warning_msg
-            })
+        warnings = [warning for warning in (translation_warning, warning_msg) if warning]
         return templates.TemplateResponse(request, "results.html", {
-            "results": results
+            "results": results,
+            "warning": "；".join(warnings),
         })
         
     except Exception as e:
