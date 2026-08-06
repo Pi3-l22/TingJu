@@ -6,8 +6,9 @@ from typing import List, Tuple
 import edge_tts
 from edge_tts import VoicesManager
 from utils.logger import logger
+from utils.runtime import DATA_DIR
 
-AUDIO_DIR = "audios"
+AUDIO_DIR = DATA_DIR / "audios"
 
 async def list_voices(locale: str = 'en-US') -> list:
     """

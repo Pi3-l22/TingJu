@@ -5,13 +5,15 @@ from pathlib import Path
 import nltk
 
 from utils.logger import logger
+from utils.runtime import DATA_DIR as RUNTIME_DATA_DIR, resource_path
 
 try:
     import pysbd
 except ImportError:
     pysbd = None
 
-DATA_DIR = "nltk_data"
+DATA_DIR = str(RUNTIME_DATA_DIR / "nltk_data")
+BUNDLED_DATA_DIR = resource_path("nltk_data")
 
 PYSBD_LANGUAGE_CODES = {
     'english': 'en',
@@ -85,8 +87,10 @@ def init_nltk():
     """
     logger.info("正在初始化 nltk 库...")
     nltk_data_dir = Path(DATA_DIR)
-    nltk_data_dir.mkdir(exist_ok=True)  
-    nltk.data.path.append(str(nltk_data_dir))
+    nltk_data_dir.mkdir(parents=True, exist_ok=True)
+    for candidate in (BUNDLED_DATA_DIR, nltk_data_dir):
+        if candidate.exists() and str(candidate) not in nltk.data.path:
+            nltk.data.path.insert(0, str(candidate))
     # 检查 punkt 是否存在, 如果不存在则下载
     try:
         nltk.data.find('tokenizers/punkt')
@@ -102,8 +106,13 @@ def init_nltk():
             punkt_tab_zip.unlink()
         try:
             # 下载 punkt 和 punkt_tab
-            nltk.download('punkt', download_dir=DATA_DIR)
-            nltk.download('punkt_tab', download_dir=DATA_DIR)
+            punkt_ok = nltk.download('punkt', download_dir=DATA_DIR)
+            punkt_tab_ok = nltk.download('punkt_tab', download_dir=DATA_DIR)
+            if not (punkt_ok and punkt_tab_ok):
+                raise RuntimeError("NLTK tokenizer download returned an unsuccessful result")
+            nltk.data.path.insert(0, str(nltk_data_dir))
+            nltk.data.find('tokenizers/punkt')
+            nltk.data.find('tokenizers/punkt_tab')
             logger.info("punkt 和 punkt_tab 下载完成")
         except Exception as e:
             logger.error(f"punkt 或 punkt_tab 下载失败，可能与网络情况有关: {e}")

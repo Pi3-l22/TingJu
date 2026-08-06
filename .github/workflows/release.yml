@@ -33,14 +33,14 @@ jobs:
             - name: Install dependencies
               run: |
                   python -m pip install --upgrade pip
-                  pip install -r requirements.txt pyinstaller
+                  pip install -r requirements.txt pyinstaller==6.21.0
 
-            - name: Install UPX (Windows)
-              if: runner.os == 'Windows'
-              shell: pwsh
+            - name: Bundle NLTK tokenizer data
               run: |
-                  choco install upx -y
-                  echo "UPX_PATH=C:\ProgramData\chocolatey\bin" >> $env:GITHUB_ENV
+                  python -c "import nltk; ok = nltk.download('punkt', download_dir='nltk_data', quiet=True) and nltk.download('punkt_tab', download_dir='nltk_data', quiet=True); nltk.data.path.insert(0, 'nltk_data'); nltk.data.find('tokenizers/punkt'); nltk.data.find('tokenizers/punkt_tab'); raise SystemExit(0 if ok else 1)"
+
+            # UPX-compressed native modules are more likely to be quarantined
+            # or delayed by Windows Defender. Keep the release uncompressed.
 
             # - name: Install UPX (Linux) (not used)
             #   if: runner.os == 'Linux'
@@ -72,12 +72,13 @@ jobs:
 
             - name: Build executable with PyInstaller
               run: |
-                  pyinstaller --name TingJu --onedir --icon "${{ github.workspace }}/static/img/icon.ico" --distpath ./dist --workpath ./build --specpath ./spec app.py
+                  pyinstaller --name TingJu --onedir --noupx --icon "${{ github.workspace }}/static/img/icon.ico" --hidden-import translators --hidden-import translators.server --distpath ./dist --workpath ./build --specpath ./spec launcher.py
 
             - name: Copy extra directories and files
               shell: bash
               run: |
                   cp -r static templates dist/TingJu
+                  [ -d nltk_data ] && cp -r nltk_data dist/TingJu || true
                   [ -f README.md ] && cp README.md dist/TingJu/ || true
                   [ -f LICENSE ] && cp LICENSE dist/TingJu/ || true
 

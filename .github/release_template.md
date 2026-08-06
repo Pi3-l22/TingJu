@@ -36,17 +36,17 @@ xattr -cr TingJu/
 
 > 💡 提示：方法一只需操作一次，之后无需重复。
 
-### 启动时出现 NLTK 词库下载失败
+### 使用某些语言时出现 NLTK 词库错误
 
 ```shell
 ERROR:   punkt 或 punkt_tab 下载失败
 ```
 
-可能是因为国外网络问题导致无法下载词库。首次使用工具时，请使用科学上网，词库下载成功后，则后续无需再使用。
+新版本发布包会预置 `punkt` 和 `punkt_tab`，且不会在启动阶段阻塞浏览器。如果使用旧版本或手动构建包，请确认以下目录存在；否则程序会尝试在首次分句时下载。
 
 punkt 和 punkt_tab 手动下载地址为 👉 [蓝奏云 - nltk_data.zip](https://wwrs.lanzouo.com/ie7x932top2b)
 
-下载 `nltk_data.zip` 并解压到工具运行根目录下即可。如: 
+下载 `nltk_data.zip` 并解压到工具运行根目录下即可。例如:
 
 ```shell
 TingJu/

@@ -101,7 +101,7 @@ pip install -r requirements.txt
 
 3. 启动应用：
 ```bash
-python app.py
+python launcher.py
 ```
 
 4. 在浏览器中访问 `http://127.0.0.1:51122` 开始使用

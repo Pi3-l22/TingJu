@@ -1,6 +1,8 @@
 import uuid
 import atexit
+import os
 import shutil
+import time
 from pathlib import Path
 from typing import Optional, List, Dict
 from datetime import datetime as dt
@@ -16,31 +18,37 @@ from utils.text_translator import get_text_translated
 from utils.audio_generator import generate_audio, list_voices, AUDIO_DIR
 from utils.language_detector import detect_language, LANGUAGE_CODES, LANGUAGE_NAMES, TTS_LOCALES
 from utils.logger import logger
+from utils.runtime import DATA_DIR, resource_path
 
 # 存储临时文件路径的全局变量
 TEMP_FILE_PATH: Optional[Path] = None
 
 # 临时目录 导出目录
-TEMP_DIR = "temp"
-EXPORT_DIR = "exports"
+TEMP_DIR = DATA_DIR / "temp"
+EXPORT_DIR = DATA_DIR / "exports"
 
 # 存储当前的UUID
 CURRENT_UUID: str = ""
 
 app = FastAPI()
 
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
 # 创建音频目录
-Path(AUDIO_DIR).mkdir(exist_ok=True)
+Path(AUDIO_DIR).mkdir(parents=True, exist_ok=True)
 # 创建临时目录
-Path(TEMP_DIR).mkdir(exist_ok=True)
+Path(TEMP_DIR).mkdir(parents=True, exist_ok=True)
 
 # 挂载静态文件目录
-app.mount(f"/{AUDIO_DIR}", StaticFiles(directory=AUDIO_DIR), name=AUDIO_DIR)
-app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/templates", StaticFiles(directory="templates"), name="templates")
+app.mount(f"/{Path(AUDIO_DIR).name}", StaticFiles(directory=AUDIO_DIR), name=Path(AUDIO_DIR).name)
+app.mount("/static", StaticFiles(directory=resource_path("static")), name="static")
+app.mount("/templates", StaticFiles(directory=resource_path("templates")), name="templates")
 
 # 配置模板
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=resource_path("templates"))
 
 def cleanup_temp_files():
     """
@@ -255,16 +263,16 @@ async def export_content():
         js_dir.mkdir(exist_ok=True)
         img_dir = Path(export_folder, "img")
         img_dir.mkdir(exist_ok=True)
-        audios_dir = Path(export_folder, AUDIO_DIR)
+        audios_dir = Path(export_folder, Path(AUDIO_DIR).name)
         audios_dir.mkdir(exist_ok=True)
         
         # 将html css js favicon.png audios 复制到 export_folder 下
         shutil.copy(Path(TEMP_DIR, f"{CURRENT_UUID}.html"), index_html)
-        shutil.copy(Path("static", "css", "common.css"), css_dir)
-        shutil.copy(Path("static", "css", "results.css"), css_dir)
-        shutil.copy(Path("static", "css", "theme.css"), css_dir)
-        shutil.copy(Path("static", "js", "results.js"), js_dir)
-        shutil.copy(Path("static", "img", "favicon.png"), img_dir)
+        shutil.copy(resource_path("static", "css", "common.css"), css_dir)
+        shutil.copy(resource_path("static", "css", "results.css"), css_dir)
+        shutil.copy(resource_path("static", "css", "theme.css"), css_dir)
+        shutil.copy(resource_path("static", "js", "results.js"), js_dir)
+        shutil.copy(resource_path("static", "img", "favicon.png"), img_dir)
         shutil.copytree(Path(AUDIO_DIR, CURRENT_UUID), Path(audios_dir, CURRENT_UUID))
         
         return {
@@ -287,7 +295,7 @@ def save_html(title: str, data: Dict[str, List[Dict[str, str]]]):
     try:
         import jinja2
         # 读取模板文件
-        with open("templates/export_template.html", encoding="utf-8") as f:
+        with open(resource_path("templates", "export_template.html"), encoding="utf-8") as f:
             template_content = f.read()
         template = jinja2.Template(template_content)
         html_content = template.render(**data)
@@ -323,45 +331,84 @@ def get_local_ips():
         
     return ips
 
-def open_browser(url: str):
+def open_browser(url: str, timeout: float = 30.0):
     """
     自动打开浏览器访问服务
     """
     import webbrowser
-    import time
-    time.sleep(2) # 等待2秒，确保服务启动完成
-    try:
-        webbrowser.open(url)
-    except Exception as e:
-        logger.warning(f"自动打开浏览器时出错: {e}")
-        
-if __name__ == "__main__":
-    import uvicorn
-    import threading
-    
-    try:
-        print("--------------------------------------------------")
-        
-        print("🚀 TingJu 服务启动中...")
-        print("👇 可以通过以下地址访问服务:")
-        print("💻 本地地址: http://127.0.0.1:51122")
-        
-        # 获取所有本地IP地址
-        local_ips = get_local_ips()
-        for ip in local_ips:
-            print(f"🌐 网络地址: http://{ip}:51122")
-        
-        print("--------------------------------------------------")
-        
-        # 初始化NLTK
-        init_nltk()
-        
-        # 启动浏览器
-        threading.Thread(target=open_browser, args=("http://127.0.0.1:51122",), daemon=True).start()
-        
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
         try:
-            uvicorn.run(app, host="0.0.0.0", port=51122)
-        except KeyboardInterrupt:
-            print("👋 TingJu 服务已停止")
+            from urllib.request import urlopen
+            with urlopen(f"{url}/health", timeout=1):
+                break
+        except Exception:
+            time.sleep(0.25)
+    else:
+        logger.warning("服务未在 %.0f 秒内就绪，未自动打开浏览器: %s", timeout, url)
+        return False
+
+    try:
+        opened = webbrowser.open(url)
+        if not opened:
+            logger.warning("系统未找到可用的默认浏览器，请手动访问: %s", url)
+        return bool(opened)
     except Exception as e:
-        logger.error(f"服务启动失败: {e}")
+        logger.warning("自动打开浏览器时出错，请手动访问 %s: %s", url, e)
+        return False
+
+
+def run(host: str = "0.0.0.0", port: int | None = None) -> int:
+    """Start the HTTP service after lightweight, non-network initialization."""
+    import threading
+    import uvicorn
+
+    if port is None:
+        try:
+            port = int(os.environ.get("TINGJU_PORT", "51122"))
+        except ValueError:
+            logger.warning("TINGJU_PORT 不是有效端口，回退到 51122")
+            port = 51122
+
+    if not 1 <= port <= 65535:
+        logger.error("端口必须在 1 到 65535 之间: %s", port)
+        print(f"Invalid port {port}; see logs: {DATA_DIR / 'logs'}", flush=True)
+        return 1
+
+    url = f"http://127.0.0.1:{port}"
+    print("--------------------------------------------------", flush=True)
+    print("TingJu service starting...", flush=True)
+    print(f"Local URL: {url}", flush=True)
+    print(f"Log directory: {DATA_DIR / 'logs'}", flush=True)
+
+    # NLTK is initialized lazily by sentence splitting.  A first-run download
+    # must never prevent the local web service from becoming ready.
+    logger.info("服务准备启动，NLTK 将在需要时初始化")
+
+    import socket
+    probe_host = "0.0.0.0" if host == "0.0.0.0" else host
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+            probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            probe.bind((probe_host, port))
+    except OSError as error:
+        logger.error("端口 %s 不可用，请关闭占用进程后重试: %s", port, error)
+        print(f"Port {port} is unavailable; see logs: {DATA_DIR / 'logs'}", flush=True)
+        return 1
+
+    if os.environ.get("TINGJU_NO_BROWSER") != "1":
+        threading.Thread(target=open_browser, args=(url,), daemon=True).start()
+    else:
+        logger.info("已通过 TINGJU_NO_BROWSER=1 跳过自动打开浏览器")
+    try:
+        uvicorn.run(app, host=host, port=port)
+    except KeyboardInterrupt:
+        logger.info("TingJu 服务已停止")
+        return 0
+    except Exception:
+        logger.exception("服务启动失败，端口=%s", port)
+        return 1
+    return 0
+
+if __name__ == "__main__":
+    raise SystemExit(run())

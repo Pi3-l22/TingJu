@@ -1,8 +1,10 @@
 import logging
 from pathlib import Path
 
+from utils.runtime import DATA_DIR
+
 # 日志目录
-LOG_DIR = "logs"
+LOG_DIR = DATA_DIR / "logs"
 
 def setup_logger(name: str = "TingJu", log_level: int = logging.INFO) -> logging.Logger:
     """
@@ -17,7 +19,14 @@ def setup_logger(name: str = "TingJu", log_level: int = logging.INFO) -> logging
     """
     # 创建日志目录
     log_dir = Path(LOG_DIR)
-    log_dir.mkdir(exist_ok=True)
+    try:
+        log_dir.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        # The bootstrap logger records the original failure.  Keep the
+        # application logger usable when the portable folder is read-only.
+        import tempfile
+        log_dir = Path(tempfile.gettempdir()) / "TingJu" / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
     
     # 创建日志记录器
     logger = logging.getLogger(name)
@@ -27,7 +36,13 @@ def setup_logger(name: str = "TingJu", log_level: int = logging.INFO) -> logging
     if not logger.handlers:
         # 创建文件处理器
         log_file = log_dir / f"{name}.log"
-        file_handler = logging.FileHandler(log_file, encoding='utf-8')
+        try:
+            file_handler = logging.FileHandler(log_file, encoding='utf-8')
+        except OSError:
+            import tempfile
+            fallback_dir = Path(tempfile.gettempdir()) / "TingJu" / "logs"
+            fallback_dir.mkdir(parents=True, exist_ok=True)
+            file_handler = logging.FileHandler(fallback_dir / f"{name}.log", encoding='utf-8')
         file_handler.setLevel(log_level)
         
         # 创建控制台处理器
@@ -47,6 +62,7 @@ def setup_logger(name: str = "TingJu", log_level: int = logging.INFO) -> logging
         # 添加处理器到日志记录器
         logger.addHandler(file_handler)
         logger.addHandler(console_handler)
+        logger.propagate = False
     
     return logger
 
