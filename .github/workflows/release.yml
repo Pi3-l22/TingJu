@@ -37,7 +37,7 @@ jobs:
 
             - name: Bundle NLTK tokenizer data
               run: |
-                  python -c "import nltk; ok = nltk.download('punkt', download_dir='nltk_data', quiet=True) and nltk.download('punkt_tab', download_dir='nltk_data', quiet=True); nltk.data.path.insert(0, 'nltk_data'); nltk.data.find('tokenizers/punkt'); nltk.data.find('tokenizers/punkt_tab'); raise SystemExit(0 if ok else 1)"
+                  python scripts/download_nltk_data.py
 
             # UPX-compressed native modules are more likely to be quarantined
             # or delayed by Windows Defender. Keep the release uncompressed.
