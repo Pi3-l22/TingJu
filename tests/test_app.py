@@ -160,6 +160,39 @@ class TestApp(unittest.IsolatedAsyncioTestCase):
         # 检查是否返回错误信息
         self.assertIn("未能从文本中分割出句子", response.text)
 
+    @unittest.skipUnless(os.environ.get("TINGJU_RUN_NETWORK_TESTS") == "1", "需要显式启用在线 TTS 测试")
+    async def test_generate_live_audio(self):
+        """真实调用语音服务，覆盖模拟音频无法发现的上游鉴权变更。"""
+        # 只隔离翻译服务；分句、TTS、文件写入、HTTP 读取和导出均使用实际实现。
+        with patch("app.get_text_translated", return_value=(
+            ["这是一个测试句子。", "你能听清这个句子吗？"], ""
+        )):
+            response = self.client.post("/generate", data={
+                "text": "This is a test sentence. Can you hear this sentence clearly?",
+                "voice": "en-US-ChristopherNeural",
+                "lang": "en",
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("该句音频生成失败", response.text)
+        audio_urls = re.findall(r'<source src="([^"]+)"', response.text)
+        self.assertEqual(len(audio_urls), 2, response.text)
+        audio_contents = {}
+        for audio_url in audio_urls:
+            audio_response = self.client.get(audio_url)
+            self.assertEqual(audio_response.status_code, 200)
+            self.assertIn("audio/mpeg", audio_response.headers["content-type"])
+            self.assertGreater(len(audio_response.content), 1000)
+            audio_contents[audio_url] = audio_response.content
+
+        export_response = self.client.get("/export")
+        self.assertEqual(export_response.json()["status"], "success")
+        export_path = Path(export_response.json()["path"])
+        exported_html = (export_path / "index.html").read_text(encoding="utf-8")
+        for audio_url, content in audio_contents.items():
+            self.assertIn(f'./{audio_url.lstrip("/")}', exported_html)
+            self.assertEqual((export_path / audio_url.lstrip("/")).read_bytes(), content)
+
     async def test_export_content(self):
         """测试导出功能"""
         # 先生成一些内容，设置CURRENT_UUID

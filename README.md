@@ -98,7 +98,7 @@ cd TingJu
 
 2. 安装依赖：
 ```bash
-pip install -r requirements.txt
+pip install --upgrade -r requirements.txt
 ```
 
 3. 启动应用：
@@ -107,6 +107,12 @@ python launcher.py
 ```
 
 4. 在浏览器中访问 `http://127.0.0.1:51122` 开始使用
+
+### 句子音频全部生成失败（HTTP 403）
+
+微软语音服务在 2026 年 10 月更新了鉴权协议，旧版 `edge-tts` 可能仍能获取音色列表，但所有语音合成请求均被拒绝。项目要求 `edge-tts>=7.3.1`，包含新协议及系统区域设置相关的时间解析修复（[上游发布说明](https://github.com/rany2/edge-tts/releases/tag/7.3.1)）。
+
+源码用户请在运行 TingJu 的 Python 环境中执行 `python -m pip install --upgrade -r requirements.txt` 后重启；可执行文件用户需要更新到包含此修复的构建，仅更新系统 Python 的依赖不会改变已打包程序。
 
 ### 使用方法
 

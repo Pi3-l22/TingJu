@@ -80,6 +80,18 @@ python -m unittest tests.test_text_processor
 python -m unittest tests.test_text_translator
 ```
 
+默认测试使用模拟 TTS，不访问微软语音服务。验证真实服务的鉴权、句子音频生成、HTTP 读取及离线导出时，可显式启用在线测试（需要联网）：
+
+```powershell
+# PowerShell；使用临时数据目录，避免清理已有学习内容
+$env:TINGJU_RUN_NETWORK_TESTS = "1"
+$env:TINGJU_DATA_DIR = Join-Path ([System.IO.Path]::GetTempPath()) ([System.Guid]::NewGuid().ToString())
+python -m unittest tests.test_app.TestApp.test_generate_live_audio -v
+Remove-Item Env:TINGJU_RUN_NETWORK_TESTS, Env:TINGJU_DATA_DIR
+```
+
+该测试仅模拟翻译结果，音频使用真实 `edge-tts` 请求；生成失败将直接导致测试失败。
+
 ### 使用run_tests.py脚本运行测试
 
 ```bash
